@@ -19,6 +19,17 @@ Recanto). Módulos entram aos poucos; o primeiro é o de iluminação pública.
   material aplicado, data e observações. Quando a ficha volta, isso é passado para
   o sistema em "Registrar o serviço feito" e a ordem fica executada.
 - Situações: `aberta` → `executada` (ou `cancelada`); dá para reabrir.
+- A ficha impressa cabe em **meia folha A4** (pedido do setor, 03/11/2026): sai na
+  metade de cima, com "corte aqui" embaixo. Mexeu na ficha, confira que continua
+  cabendo (≤ ~140 mm de altura na largura de 190 mm).
+- **Banco de materiais** (`materiais`, migration 0002): a lista que aparece na baixa
+  para escolher com um toque; cada material é por peça (`un`) ou por metro (`m`).
+  O que foi aplicado vai em `ordem_materiais` com quantidade, nome e unidade
+  copiados. Material fora da lista entra só com a descrição (`material_id` nulo).
+  Material sai de uso desativado, nunca apagado. A coluna antiga
+  `ordens_servico.material` (texto) ficou só para as ordens baixadas antes disso.
+- Os pedidos rápidos do "Serviço solicitado" ficam em `SERVICOS_COMUNS`
+  (`lib/iluminacao.ts`).
 
 ## Stack e decisões
 

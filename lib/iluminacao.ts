@@ -1,4 +1,4 @@
-import type { SituacaoOrdem } from "./types";
+import type { SituacaoOrdem, UnidadeMaterial } from "./types";
 
 /** Nº da ordem como sai impresso: 12 → "000012". */
 export function numeroDaOrdem(numero: number): string {
@@ -35,16 +35,38 @@ export function mascaraTelefone(texto: string): string {
   return resto.length <= meio ? ddd + resto : `${ddd}${resto.slice(0, meio)}-${resto.slice(meio)}`;
 }
 
-/** Pedidos que mais aparecem — um toque preenche o "Serviço solicitado". */
+/**
+ * Pedidos que mais aparecem — um toque preenche o "Serviço solicitado".
+ * A lista veio do setor de iluminação (03/11/2026).
+ */
 export const SERVICOS_COMUNS = [
-  "Lâmpada apagada",
-  "Lâmpada acesa durante o dia",
-  "Lâmpada piscando",
+  "Lâmpada queimada",
+  "Luminária queimada",
+  "Lâmpada acesa de dia",
+  "Luminária virada",
+  "Luminária quebrada",
+  "Chave I.P. queimada",
+  "Chave I.P. avariada",
+  "Cabo partido",
   "Troca de relé",
-  "Luminária ou braço quebrado",
-  "Fiação solta ou caída",
-  "Instalação de ponto novo",
+  "Troca de chave I.P.",
+  "Instalação de rede",
+  "Instalação de kit completo",
+  "Ampliação de rede",
+  "Instalação de poste de concreto",
+  "Instalação de postes de ferro",
+  "Substituição de bocal",
+  "Instalação de isolador",
+  "Manutenção geral",
+  "Instalação de base para relé",
+  "Instalação de refletor para evento",
+  "Troca de bomba submersa",
 ] as const;
+
+/** "2 un" / "15 m" / "1,5 m" — a quantidade como sai na ficha. */
+export function quantidadeComUnidade(quantidade: number, unidade: UnidadeMaterial): string {
+  return `${quantidade.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} ${unidade}`;
+}
 
 export const NOME_SITUACAO: Record<SituacaoOrdem, string> = {
   aberta: "Aberta",

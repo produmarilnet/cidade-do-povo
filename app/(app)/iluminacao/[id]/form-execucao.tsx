@@ -3,19 +3,26 @@
 import { Assistente, Passo } from "@/components/assistente";
 import { AreaTexto, Campo, Rotulo } from "@/components/ui";
 import type { Resultado } from "@/lib/resultado";
-import type { OrdemServico } from "@/lib/types";
+import type { Material, MaterialDaOrdem, OrdemServico } from "@/lib/types";
+import { EscolherMateriais } from "./escolher-materiais";
 
 /** Passa para o sistema o que o eletricista escreveu na ficha. */
 export function FormExecucao({
   ordem,
   acao,
   eletricistas,
+  materiais,
+  materiaisDaOrdem,
   hoje,
 }: {
   ordem: OrdemServico;
   acao: (anterior: Resultado, dados: FormData) => Promise<Resultado>;
   /** Nomes já usados e usuários eletricistas — aparecem como sugestão no campo. */
   eletricistas: string[];
+  /** O banco de materiais (só os ativos). */
+  materiais: Material[];
+  /** O que já foi registrado nesta ordem — ao corrigir a baixa. */
+  materiaisDaOrdem: MaterialDaOrdem[];
   hoje: string;
 }) {
   const jaRegistrada = ordem.situacao === "executada";
@@ -31,10 +38,17 @@ export function FormExecucao({
           ))}
         </datalist>
       </Passo>
-      <Passo titulo="Material aplicado" dica="O que foi usado: lâmpada, relé, reator, fio… Se não usou nada, deixe em branco.">
-        <Rotulo texto="Material aplicado (opcional)">
-          <AreaTexto name="material" rows={4} defaultValue={ordem.material ?? ""} />
-        </Rotulo>
+      <Passo
+        titulo="Material aplicado"
+        dica="Toque no material usado — cada toque soma mais um. Se não usou nada, é só continuar."
+      >
+        <EscolherMateriais materiais={materiais} inicial={materiaisDaOrdem} />
+        {/* ordem baixada antes do banco de materiais: o texto antigo continua editável */}
+        {ordem.material && (
+          <Rotulo texto="Material escrito antes (opcional)">
+            <AreaTexto name="material" rows={3} defaultValue={ordem.material} />
+          </Rotulo>
+        )}
       </Passo>
       <Passo titulo="Data do serviço">
         <Rotulo texto="Data">

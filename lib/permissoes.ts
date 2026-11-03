@@ -8,6 +8,8 @@ export const PODE = {
   abrirOrdens: ["admin", "atendente"],
   // passar para o sistema o que o eletricista fez na rua
   registrarExecucao: ["admin", "atendente", "eletricista"],
+  // incluir, renomear e desativar itens do banco de materiais
+  gerenciarMateriais: ["admin", "atendente"],
 } satisfies Record<string, readonly Papel[]>;
 
 export type Permissao = keyof typeof PODE;

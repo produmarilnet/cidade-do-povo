@@ -15,7 +15,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (pode(usuario.papel, "verIluminacao")) {
     grupos.push({
       titulo: "Iluminação pública",
-      itens: [{ href: "/iluminacao", texto: "Ordens de serviço", icone: "iluminacao" }],
+      itens: [
+        { href: "/iluminacao", texto: "Ordens de serviço", icone: "iluminacao" },
+        { href: "/iluminacao/materiais", texto: "Banco de materiais", icone: "materiais" },
+      ],
     });
   }
 

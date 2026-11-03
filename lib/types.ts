@@ -39,3 +39,23 @@ export type OrdemServico = {
   data_execucao: string | null; // AAAA-MM-DD
   observacoes: string | null;
 };
+
+/** "un" = peça; "m" = metro (cabo). */
+export type UnidadeMaterial = "un" | "m";
+
+/** Item do banco de materiais (migration 0002). */
+export type Material = {
+  id: string;
+  nome: string;
+  unidade: UnidadeMaterial;
+  ordem: number;
+  ativo: boolean;
+};
+
+/** Material aplicado numa ordem — nome e unidade copiados na hora da baixa. */
+export type MaterialDaOrdem = {
+  material_id: string | null; // null = "outros", fora da lista
+  descricao: string;
+  quantidade: number;
+  unidade: UnidadeMaterial;
+};

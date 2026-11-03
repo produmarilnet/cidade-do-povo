@@ -5,7 +5,7 @@ import { exigirUsuario } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { pode } from "@/lib/permissoes";
 import { COR_SITUACAO, NOME_SITUACAO, numeroDaOrdem } from "@/lib/iluminacao";
-import type { OrdemServico } from "@/lib/types";
+import type { Material, MaterialDaOrdem, OrdemServico } from "@/lib/types";
 import { hoje } from "@/lib/utils";
 import { BotaoAcao } from "@/components/formulario";
 import { BotaoImprimir } from "@/components/imprimir";
@@ -29,6 +29,14 @@ export default async function OrdemPage({
   const podeAbrir = pode(eu.papel, "abrirOrdens");
   const podeRegistrar = pode(eu.papel, "registrarExecucao") && ordem.situacao !== "cancelada";
 
+  const materiaisDaOrdem = await sql<MaterialDaOrdem[]>`
+    select material_id, descricao, quantidade, unidade
+    from ordem_materiais where ordem_id = ${ordem.id}
+    order by posicao`;
+  const materiais = podeRegistrar
+    ? await sql<Material[]>`select * from materiais where ativo order by ordem, nome`
+    : [];
+
   const eletricistas = podeRegistrar
     ? (
         await sql<{ nome: string }[]>`
@@ -41,8 +49,8 @@ export default async function OrdemPage({
 
   return (
     <>
-      {/* Uma folha A4 por ficha, sem o cabeçalho e o rodapé do navegador. */}
-      <style>{`@page { size: A4; margin: 12mm; }`}</style>
+      {/* Folha A4, sem o cabeçalho e o rodapé do navegador; a ficha ocupa a metade de cima. */}
+      <style>{`@page { size: A4; margin: 8mm 10mm; }`}</style>
 
       <div className="print:hidden">
         <Link href="/iluminacao" className="mb-2 inline-flex items-center gap-1 text-sm text-stone-500 hover:text-stone-800">
@@ -70,7 +78,7 @@ export default async function OrdemPage({
       </div>
 
       <Cartao className="mb-6 p-6 print:border-0 print:p-0 print:shadow-none">
-        <Ficha ordem={ordem} />
+        <Ficha ordem={ordem} materiais={materiaisDaOrdem} />
       </Cartao>
 
       <div className="flex flex-col gap-4 print:hidden">
@@ -87,6 +95,8 @@ export default async function OrdemPage({
               ordem={ordem}
               acao={registrarExecucao.bind(null, ordem.id)}
               eletricistas={eletricistas}
+              materiais={materiais}
+              materiaisDaOrdem={materiaisDaOrdem}
               hoje={hoje()}
             />
           </Cartao>

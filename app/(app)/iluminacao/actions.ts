@@ -77,6 +77,26 @@ const esquemaExecucao = z.object({
   observacoes: opcional,
 });
 
+/** O material escolhido na baixa, que chega em JSON do campo escondido. */
+const esquemaMateriais = z.array(
+  z.object({
+    material_id: z.string().uuid().nullable(),
+    descricao: z.string().trim().min(1, "Diga qual é o outro material.").max(200),
+    quantidade: z.number().positive("A quantidade do material precisa ser maior que zero.").max(99999),
+    unidade: z.enum(["un", "m"]),
+  }),
+);
+
+function lerMateriais(texto: FormDataEntryValue | null) {
+  let json: unknown = [];
+  try {
+    json = JSON.parse(typeof texto === "string" && texto ? texto : "[]");
+  } catch {
+    json = null;
+  }
+  return esquemaMateriais.safeParse(json);
+}
+
 /** Passa para o sistema o que veio escrito na ficha da rua e dá a ordem como executada. */
 export async function registrarExecucao(id: string, _: Resultado, dados: FormData): Promise<Resultado> {
   const eu = await exigirUsuario("registrarExecucao");
@@ -87,14 +107,29 @@ export async function registrarExecucao(id: string, _: Resultado, dados: FormDat
     observacoes: dados.get("observacoes") ?? "",
   });
   if (!lido.success) return erroDeValidacao(lido.error);
+  const materiais = lerMateriais(dados.get("materiais"));
+  if (!materiais.success) return erroDeValidacao(materiais.error);
   const e = lido.data;
-  const feitas = await sql`
-    update ordens_servico set
-      situacao = 'executada', eletricista = ${e.eletricista}, material = ${e.material},
-      data_execucao = ${e.data_execucao}, observacoes = ${e.observacoes},
-      baixa_por = ${eu.id}, atualizado_em = now()
-    where id = ${id} and situacao <> 'cancelada'`;
-  if (feitas.count === 0) return { ok: false, erro: "Ordem cancelada não pode ser executada. Reabra antes." };
+
+  // A ordem e o material dela mudam juntos: ou grava tudo, ou nada.
+  const gravou = await sql.begin(async (tx) => {
+    const feitas = await tx`
+      update ordens_servico set
+        situacao = 'executada', eletricista = ${e.eletricista}, material = ${e.material},
+        data_execucao = ${e.data_execucao}, observacoes = ${e.observacoes},
+        baixa_por = ${eu.id}, atualizado_em = now()
+      where id = ${id} and situacao <> 'cancelada'`;
+    if (feitas.count === 0) return false;
+    // corrigir a baixa troca a lista inteira pelo que está na tela
+    await tx`delete from ordem_materiais where ordem_id = ${id}`;
+    for (const [posicao, m] of materiais.data.entries()) {
+      await tx`
+        insert into ordem_materiais (ordem_id, material_id, descricao, quantidade, unidade, posicao)
+        values (${id}, ${m.material_id}, ${m.descricao}, ${m.quantidade}, ${m.unidade}, ${posicao})`;
+    }
+    return true;
+  });
+  if (!gravou) return { ok: false, erro: "Ordem cancelada não pode ser executada. Reabra antes." };
   revalidatePath("/iluminacao");
   revalidatePath(`/iluminacao/${id}`);
   return { ok: true, mensagem: "Serviço registrado. A ordem está executada." };

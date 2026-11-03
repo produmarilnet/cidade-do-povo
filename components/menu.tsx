@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Lightbulb, LogOut, Menu, RefreshCw, UserCog, Users, X } from "lucide-react";
+import { LayoutDashboard, Lightbulb, LogOut, Menu, Package, RefreshCw, UserCog, Users, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Marca } from "./marca";
 import { atualizarSistema, textoDaVersao } from "./atualizacao";
@@ -20,6 +20,7 @@ export type GrupoMenu = { titulo?: string; itens: ItemMenu[] };
 const ICONES = {
   painel: LayoutDashboard,
   iluminacao: Lightbulb,
+  materiais: Package,
   usuarios: Users,
   minhaConta: UserCog,
 };
@@ -37,6 +38,14 @@ export function MenuLateral({
 }) {
   const [aberto, setAberto] = useState(false);
   const caminho = usePathname();
+  // Acende só o item mais específico: em /iluminacao/materiais é o "Banco de
+  // materiais", não também o "Ordens de serviço" (/iluminacao).
+  const noCaminho = (href: string) =>
+    href === "/" ? caminho === "/" : caminho === href || caminho.startsWith(`${href}/`);
+  const maisEspecifico = grupos
+    .flatMap((g) => g.itens)
+    .filter((item) => noCaminho(item.href))
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   const conteudo = (
     <nav className="flex h-full flex-col gap-4 p-4">
@@ -53,7 +62,7 @@ export function MenuLateral({
             )}
             {grupo.itens.map((item) => {
               const Icone = ICONES[item.icone];
-              const ativo = item.href === "/" ? caminho === "/" : caminho.startsWith(item.href);
+              const ativo = item.href === maisEspecifico;
               if (item.emBreve) {
                 return (
                   <span
