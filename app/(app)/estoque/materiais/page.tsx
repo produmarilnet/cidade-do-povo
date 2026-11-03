@@ -3,6 +3,7 @@ import { ChevronLeft, Pencil } from "lucide-react";
 import { exigirUsuario } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { pode } from "@/lib/permissoes";
+import { quantidadeComUnidade } from "@/lib/iluminacao";
 import type { Material } from "@/lib/types";
 import { Assistente } from "@/components/assistente";
 import { BotaoAcao } from "@/components/formulario";
@@ -16,7 +17,7 @@ import { CamposMaterial } from "./campos-material";
  * saiu de uso.
  */
 export default async function MateriaisPage() {
-  const eu = await exigirUsuario("verIluminacao");
+  const eu = await exigirUsuario("verEstoque");
   const podeMexer = pode(eu.papel, "gerenciarMateriais");
 
   const materiais = await sql<(Material & { usos: number })[]>`
@@ -27,13 +28,14 @@ export default async function MateriaisPage() {
 
   return (
     <>
-      <Link href="/iluminacao" className="mb-2 inline-flex items-center gap-1 text-sm text-stone-500 hover:text-stone-800">
+      <Link href="/estoque" className="mb-2 inline-flex items-center gap-1 text-sm text-stone-500 hover:text-stone-800">
         <ChevronLeft className="h-4 w-4" />
-        Ordens de serviço
+        Estoque
       </Link>
       <Titulo>Banco de materiais</Titulo>
       <p className="-mt-2 mb-4 text-sm text-stone-500">
-        É a lista que aparece na baixa da ordem, quando a ficha volta da rua. {ativos} materiais em uso.
+        É a lista do estoque e a que aparece na baixa da ordem, quando a ficha volta da rua. {ativos} materiais em
+        uso.
       </p>
 
       <div className="flex flex-col gap-4">
@@ -53,6 +55,11 @@ export default async function MateriaisPage() {
                 <div className="min-w-0 flex-1">
                   <span className={m.ativo ? "font-medium" : "text-stone-400 line-through"}>{m.nome}</span>
                   <span className="ml-2 text-xs text-stone-500">{m.unidade === "m" ? "por metro" : "por peça"}</span>
+                  {m.estoque_minimo > 0 && (
+                    <span className="ml-2 text-xs text-stone-500">
+                      · mínimo {quantidadeComUnidade(m.estoque_minimo, m.unidade)}
+                    </span>
+                  )}
                   {m.usos > 0 && (
                     <span className="ml-2 text-xs text-stone-400">
                       · em {m.usos} {m.usos === 1 ? "ordem" : "ordens"}
@@ -63,7 +70,7 @@ export default async function MateriaisPage() {
                 {podeMexer && (
                   <>
                     <Link
-                      href={`/iluminacao/materiais/${m.id}`}
+                      href={`/estoque/materiais/${m.id}`}
                       className="inline-flex h-9 items-center gap-1 rounded-lg px-3 text-sm text-stone-600 hover:bg-stone-100"
                     >
                       <Pencil className="h-3.5 w-3.5" />

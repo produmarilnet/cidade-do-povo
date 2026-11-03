@@ -3,7 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Lightbulb, LogOut, Menu, Package, RefreshCw, UserCog, Users, X } from "lucide-react";
+import {
+  ArrowDownToLine,
+  Boxes,
+  LayoutDashboard,
+  Lightbulb,
+  LogOut,
+  Menu,
+  Package,
+  RefreshCw,
+  UserCog,
+  Users,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Marca } from "./marca";
 import { atualizarSistema, textoDaVersao } from "./atualizacao";
@@ -20,6 +32,8 @@ export type GrupoMenu = { titulo?: string; itens: ItemMenu[] };
 const ICONES = {
   painel: LayoutDashboard,
   iluminacao: Lightbulb,
+  estoque: Boxes,
+  entrada: ArrowDownToLine,
   materiais: Package,
   usuarios: Users,
   minhaConta: UserCog,
@@ -38,8 +52,8 @@ export function MenuLateral({
 }) {
   const [aberto, setAberto] = useState(false);
   const caminho = usePathname();
-  // Acende só o item mais específico: em /iluminacao/materiais é o "Banco de
-  // materiais", não também o "Ordens de serviço" (/iluminacao).
+  // Acende só o item mais específico: em /estoque/materiais é o "Banco de
+  // materiais", não também o "Saldo do estoque" (/estoque).
   const noCaminho = (href: string) =>
     href === "/" ? caminho === "/" : caminho === href || caminho.startsWith(`${href}/`);
   const maisEspecifico = grupos

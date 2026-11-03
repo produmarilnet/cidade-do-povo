@@ -2,6 +2,7 @@
 
 import { Escolha, Passo } from "@/components/assistente";
 import { Campo, Rotulo } from "@/components/ui";
+import { quantidadeParaCampo } from "@/lib/estoque";
 import type { Material } from "@/lib/types";
 
 /** O passo do material — igual para incluir e para alterar. */
@@ -20,6 +21,19 @@ export function CamposMaterial({ material }: { material?: Material }) {
           { valor: "m", texto: "Por metro", detalhe: "cabo" },
         ]}
       />
+      <Rotulo texto="Estoque mínimo (opcional)">
+        <Campo
+          name="estoque_minimo"
+          inputMode="decimal"
+          defaultValue={quantidadeParaCampo(material?.estoque_minimo ?? 0)}
+          placeholder="Ex.: 10"
+          autoComplete="off"
+          voz={false}
+        />
+        <span className="text-xs font-normal text-stone-500">
+          Quando o saldo chegar nesse número, o estoque avisa que está acabando. Em branco, não avisa.
+        </span>
+      </Rotulo>
     </Passo>
   );
 }

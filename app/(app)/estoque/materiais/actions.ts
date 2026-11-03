@@ -5,15 +5,21 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { sql } from "@/lib/db";
 import { exigirUsuario } from "@/lib/auth";
+import { lerQuantidade } from "@/lib/estoque";
 import { erroDeValidacao, type Resultado } from "@/lib/resultado";
 
 const esquemaMaterial = z.object({
   nome: z.string().trim().min(2, "Informe o nome do material.").max(120),
   unidade: z.enum(["un", "m"], { message: "Diga se o material é contado por peça ou por metro." }),
+  estoque_minimo: z.number().min(0).max(99999),
 });
 
 function lerMaterial(dados: FormData) {
-  return esquemaMaterial.safeParse({ nome: dados.get("nome") ?? "", unidade: dados.get("unidade") ?? "" });
+  return esquemaMaterial.safeParse({
+    nome: dados.get("nome") ?? "",
+    unidade: dados.get("unidade") ?? "",
+    estoque_minimo: lerQuantidade(String(dados.get("estoque_minimo") ?? "")),
+  });
 }
 
 /** O banco não deixa dois materiais com o mesmo nome. */
@@ -29,13 +35,13 @@ export async function incluirMaterial(_: Resultado, dados: FormData): Promise<Re
   const m = lido.data;
   try {
     await sql`
-      insert into materiais (nome, unidade, ordem)
-      values (${m.nome}, ${m.unidade}, (select coalesce(max(ordem), 0) + 1 from materiais))`;
+      insert into materiais (nome, unidade, estoque_minimo, ordem)
+      values (${m.nome}, ${m.unidade}, ${m.estoque_minimo}, (select coalesce(max(ordem), 0) + 1 from materiais))`;
   } catch (e) {
     if (nomeRepetido(e)) return { ok: false, erro: `"${m.nome}" já está no banco de materiais.` };
     throw e;
   }
-  revalidatePath("/iluminacao/materiais");
+  revalidatePath("/estoque/materiais");
   return { ok: true, mensagem: `"${m.nome}" entrou no banco de materiais.` };
 }
 
@@ -46,18 +52,20 @@ export async function alterarMaterial(id: string, _: Resultado, dados: FormData)
   if (!lido.success) return erroDeValidacao(lido.error);
   const m = lido.data;
   try {
-    await sql`update materiais set nome = ${m.nome}, unidade = ${m.unidade} where id = ${id}`;
+    await sql`
+      update materiais set nome = ${m.nome}, unidade = ${m.unidade}, estoque_minimo = ${m.estoque_minimo}
+      where id = ${id}`;
   } catch (e) {
     if (nomeRepetido(e)) return { ok: false, erro: `"${m.nome}" já está no banco de materiais.` };
     throw e;
   }
-  revalidatePath("/iluminacao/materiais");
-  redirect("/iluminacao/materiais");
+  revalidatePath("/estoque/materiais");
+  redirect("/estoque/materiais");
 }
 
 /** Desativado some da baixa da ordem, mas continua nas ordens em que já foi usado. */
 export async function ativarMaterial(id: string, ativo: boolean): Promise<void> {
   await exigirUsuario("gerenciarMateriais");
   await sql`update materiais set ativo = ${ativo} where id = ${id}`;
-  revalidatePath("/iluminacao/materiais");
+  revalidatePath("/estoque/materiais");
 }

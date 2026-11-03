@@ -31,6 +31,21 @@ Recanto). Módulos entram aos poucos; o primeiro é o de iluminação pública.
 - Os pedidos rápidos do "Serviço solicitado" ficam em `SERVICOS_COMUNS`
   (`lib/iluminacao.ts`).
 
+- **Estoque** (`/estoque`, migration 0003). Saldo = entradas − saídas ± acertos,
+  calculado na view `v_estoque`:
+  - **Entrada:** a nota que chegou (`estoque_entradas`: data, fornecedor, documento)
+    e os materiais dela (`estoque_entrada_itens`). Lançou errado: apaga a entrada.
+  - **Saída:** ninguém lança. É o `ordem_materiais` das ordens **executadas**. Ordem
+    reaberta deixa de contar até ser executada de novo. Material "outros" não conta.
+  - **Acerto pela contagem** (`estoque_acertos`): a pessoa informa o que contou e o
+    sistema grava a diferença com o motivo.
+  - A baixa da ordem **não trava** sem estoque: avisa, e o saldo fica negativo
+    ("falta lançar entrada").
+  - `materiais.estoque_minimo`: no mínimo, o material aparece como "acabando".
+  - O banco de materiais mora em `/estoque/materiais` (o `/iluminacao/materiais`
+    redireciona). O seletor com quantidade (`components/escolher-materiais.tsx`)
+    serve para a baixa e para a entrada.
+
 ## Stack e decisões
 
 - Next.js 14 App Router · TypeScript · Tailwind · Postgres puro com o driver `postgres`.

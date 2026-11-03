@@ -4,7 +4,7 @@ import { Assistente, Passo } from "@/components/assistente";
 import { AreaTexto, Campo, Rotulo } from "@/components/ui";
 import type { Resultado } from "@/lib/resultado";
 import type { Material, MaterialDaOrdem, OrdemServico } from "@/lib/types";
-import { EscolherMateriais } from "./escolher-materiais";
+import { EscolherMateriais } from "@/components/escolher-materiais";
 
 /** Passa para o sistema o que o eletricista escreveu na ficha. */
 export function FormExecucao({
@@ -13,6 +13,7 @@ export function FormExecucao({
   eletricistas,
   materiais,
   materiaisDaOrdem,
+  saldos,
   hoje,
 }: {
   ordem: OrdemServico;
@@ -23,6 +24,8 @@ export function FormExecucao({
   materiais: Material[];
   /** O que já foi registrado nesta ordem — ao corrigir a baixa. */
   materiaisDaOrdem: MaterialDaOrdem[];
+  /** Saldo do estoque de cada material, sem o que esta própria ordem já gastou. */
+  saldos: Record<string, number>;
   hoje: string;
 }) {
   const jaRegistrada = ordem.situacao === "executada";
@@ -42,7 +45,7 @@ export function FormExecucao({
         titulo="Material aplicado"
         dica="Toque no material usado — cada toque soma mais um. Se não usou nada, é só continuar."
       >
-        <EscolherMateriais materiais={materiais} inicial={materiaisDaOrdem} />
+        <EscolherMateriais materiais={materiais} inicial={materiaisDaOrdem} saldos={saldos} />
         {/* ordem baixada antes do banco de materiais: o texto antigo continua editável */}
         {ordem.material && (
           <Rotulo texto="Material escrito antes (opcional)">

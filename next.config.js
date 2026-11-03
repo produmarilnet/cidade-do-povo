@@ -15,6 +15,10 @@ const nextConfig = {
     // problema das variáveis do EasyPanel.
     VERSAO_DO_APP: process.env.VERSAO_DO_APP,
   },
+  // O banco de materiais saiu da Iluminação e foi para o Estoque (03/11/2026).
+  async redirects() {
+    return [{ source: "/iluminacao/materiais/:resto*", destination: "/estoque/materiais/:resto*", permanent: false }];
+  },
   experimental: {
     optimizePackageImports: ["lucide-react"],
     // Fora do pacote do Next: assim o driver vai inteiro para

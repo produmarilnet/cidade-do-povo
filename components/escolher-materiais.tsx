@@ -2,39 +2,49 @@
 
 import { useMemo, useRef, useState } from "react";
 import { Minus, Plus, Search, X } from "lucide-react";
+import { lerQuantidade } from "@/lib/estoque";
 import { quantidadeComUnidade } from "@/lib/iluminacao";
 import type { Material, MaterialDaOrdem, UnidadeMaterial } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-// ── Material aplicado ──────────────────────────────────────────────────────
+// ── Escolher materiais com quantidade ──────────────────────────────────────
 //
 // O banco de materiais aparece em botões: um toque põe o material na lista com
 // 1 unidade (ou 1 metro), outro toque soma mais um. Na lista dá para acertar a
 // quantidade e tirar. "Outro material" abre uma linha para escrever o que não
-// está no banco.
+// está no banco (só na baixa da ordem: na entrada do estoque não existe).
 //
+// Serve para a baixa da ordem (material aplicado) e para a entrada no estoque.
 // O que foi escolhido vai para a server action num campo escondido, em JSON.
 
 type Linha = MaterialDaOrdem & { chave: number };
 
+// Tira os acentos para a busca: "rele" acha "Relé".
 const semAcento = (t: string) =>
   t
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/\p{M}/gu, "")
     .toLowerCase();
-
-/** "1,5" ou "1.5" → 1.5; o que não for número vira 0. */
-function lerQuantidade(texto: string): number {
-  const n = Number(texto.replace(",", "."));
-  return Number.isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : 0;
-}
 
 export function EscolherMateriais({
   materiais,
   inicial,
+  name = "materiais",
+  rotulo = "Material aplicado",
+  permitirOutro = true,
+  saldos,
+  entrada = false,
 }: {
   materiais: Material[];
   inicial: MaterialDaOrdem[];
+  name?: string;
+  /** O nome na conferência do passo a passo. */
+  rotulo?: string;
+  permitirOutro?: boolean;
+  /** Saldo de cada material (por id): aparece na lista e avisa quando não dá. */
+  saldos?: Record<string, number>;
+  /** Entrada no estoque: soma ao saldo em vez de tirar (e não avisa de falta). */
+  entrada?: boolean;
 }) {
   const [linhas, setLinhas] = useState<Linha[]>(() => inicial.map((m, i) => ({ ...m, chave: i })));
   const proxima = useRef(inicial.length);
@@ -75,6 +85,11 @@ export function EscolherMateriais({
     setLinhas((atual) => atual.filter((l) => l.chave !== chave));
   }
 
+  /** Quanto há no estoque para esta lista (quem chama já acerta o saldo, se precisar). */
+  function disponivel(materialId: string): number {
+    return saldos?.[materialId] ?? 0;
+  }
+
   // "outro" sem descrição ou com quantidade zerada não vai para o banco
   const validas = linhas.filter((l) => l.descricao.trim() && l.quantidade > 0);
   const resumo = validas.map((l) => `${quantidadeComUnidade(l.quantidade, l.unidade)} · ${l.descricao.trim()}`).join("\n");
@@ -84,9 +99,9 @@ export function EscolherMateriais({
     <div className="flex flex-col gap-3">
       <input
         type="hidden"
-        name="materiais"
+        name={name}
         value={JSON.stringify(validas.map(({ chave: _, ...m }) => ({ ...m, descricao: m.descricao.trim() })))}
-        data-conferir="Material aplicado"
+        data-conferir={rotulo}
         data-texto={resumo || "Nenhum material"}
       />
 
@@ -95,7 +110,17 @@ export function EscolherMateriais({
           {linhas.map((l) => (
             <li key={l.chave} className="flex flex-wrap items-center gap-2 px-3 py-2">
               {l.material_id ? (
-                <span className="min-w-0 flex-1 text-sm font-medium">{l.descricao}</span>
+                <span className="min-w-0 flex-1 text-sm font-medium">
+                  {l.descricao}
+                  {saldos && (
+                    <AvisoDeSaldo
+                      disponivel={disponivel(l.material_id)}
+                      pedido={l.quantidade}
+                      unidade={l.unidade}
+                      entrada={entrada}
+                    />
+                  )}
+                </span>
               ) : (
                 <input
                   value={l.descricao}
@@ -185,17 +210,62 @@ export function EscolherMateriais({
             )}
           >
             {m.nome}
+            {saldos && (
+              <span className={cn("ml-1.5 text-xs tabular-nums", disponivel(m.id) > 0 ? "text-stone-400" : "text-red-600")}>
+                {quantidadeComUnidade(disponivel(m.id), m.unidade)}
+              </span>
+            )}
           </button>
         ))}
-        <button
-          type="button"
-          onClick={outro}
-          className="rounded-full border border-dashed border-stone-400 bg-white px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50"
-        >
-          + Outro material (especificar)
-        </button>
+        {permitirOutro && (
+          <button
+            type="button"
+            onClick={outro}
+            className="rounded-full border border-dashed border-stone-400 bg-white px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50"
+          >
+            + Outro material (especificar)
+          </button>
+        )}
         {visiveis.length === 0 && <p className="w-full text-sm text-stone-500">Nenhum material com esse nome no banco.</p>}
       </div>
     </div>
+  );
+}
+
+/**
+ * Embaixo do nome: quanto tem no estoque. Se a baixa pede mais do que há, avisa
+ * — mas não trava: o material já foi usado na rua, e a falta aparece no saldo
+ * (negativo) até alguém lançar a entrada que faltou.
+ */
+function AvisoDeSaldo({
+  disponivel,
+  pedido,
+  unidade,
+  entrada,
+}: {
+  disponivel: number;
+  pedido: number;
+  unidade: UnidadeMaterial;
+  entrada: boolean;
+}) {
+  if (entrada) {
+    return (
+      <span className="block text-xs font-normal text-stone-500">
+        No estoque: {quantidadeComUnidade(disponivel, unidade)} · fica{" "}
+        {quantidadeComUnidade(Math.round((disponivel + pedido) * 100) / 100, unidade)}
+      </span>
+    );
+  }
+  if (pedido > disponivel) {
+    return (
+      <span className="block text-xs font-normal text-amber-700">
+        O estoque tem só {quantidadeComUnidade(Math.max(disponivel, 0), unidade)} — o saldo vai ficar negativo.
+      </span>
+    );
+  }
+  return (
+    <span className="block text-xs font-normal text-stone-500">
+      No estoque: {quantidadeComUnidade(disponivel, unidade)}
+    </span>
   );
 }

@@ -5,7 +5,7 @@ import { exigirUsuario } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { pode } from "@/lib/permissoes";
 import { COR_SITUACAO, NOME_SITUACAO, numeroDaOrdem } from "@/lib/iluminacao";
-import type { Material, MaterialDaOrdem, OrdemServico } from "@/lib/types";
+import type { MaterialDaOrdem, OrdemServico, SaldoMaterial } from "@/lib/types";
 import { hoje } from "@/lib/utils";
 import { BotaoAcao } from "@/components/formulario";
 import { BotaoImprimir } from "@/components/imprimir";
@@ -33,9 +33,18 @@ export default async function OrdemPage({
     select material_id, descricao, quantidade, unidade
     from ordem_materiais where ordem_id = ${ordem.id}
     order by posicao`;
+  // o banco de materiais já com o saldo do estoque de cada um
   const materiais = podeRegistrar
-    ? await sql<Material[]>`select * from materiais where ativo order by ordem, nome`
+    ? await sql<SaldoMaterial[]>`select * from v_estoque where ativo order by ordem, nome`
     : [];
+  const saldos: Record<string, number> = Object.fromEntries(materiais.map((m) => [m.id, m.saldo]));
+  // corrigindo a baixa: o que esta ordem já gastou está descontado do saldo e
+  // volta para a conta (senão ela "não teria" o próprio material)
+  if (ordem.situacao === "executada") {
+    for (const m of materiaisDaOrdem) {
+      if (m.material_id) saldos[m.material_id] = Math.round(((saldos[m.material_id] ?? 0) + m.quantidade) * 100) / 100;
+    }
+  }
 
   const eletricistas = podeRegistrar
     ? (
@@ -97,6 +106,7 @@ export default async function OrdemPage({
               eletricistas={eletricistas}
               materiais={materiais}
               materiaisDaOrdem={materiaisDaOrdem}
+              saldos={saldos}
               hoje={hoje()}
             />
           </Cartao>

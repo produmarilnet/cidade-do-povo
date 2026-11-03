@@ -10,6 +10,10 @@ export const PODE = {
   registrarExecucao: ["admin", "atendente", "eletricista"],
   // incluir, renomear e desativar itens do banco de materiais
   gerenciarMateriais: ["admin", "atendente"],
+  // ver o saldo do estoque e o extrato de cada material
+  verEstoque: ["admin", "atendente", "eletricista", "visualizador"],
+  // dar entrada de material e acertar o saldo pela contagem
+  movimentarEstoque: ["admin", "atendente"],
 } satisfies Record<string, readonly Papel[]>;
 
 export type Permissao = keyof typeof PODE;

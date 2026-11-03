@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Lightbulb, Plus } from "lucide-react";
+import { ArrowDownToLine, Boxes, Lightbulb, Plus } from "lucide-react";
 import { exigirUsuario } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { pode } from "@/lib/permissoes";
@@ -19,6 +19,15 @@ export default async function PainelPage({ searchParams }: { searchParams: { "se
               and date_trunc('month', data_execucao) = date_trunc('month', (now() at time zone 'America/Sao_Paulo')::date)
           )::int as executadas_mes
         from ordens_servico`
+    : [];
+
+  // o estoque: o que acabou e o que está acabando (só dos materiais em uso)
+  const [e] = pode(eu.papel, "verEstoque")
+    ? await sql<{ sem: number; baixo: number }[]>`
+        select
+          count(*) filter (where saldo <= 0)::int as sem,
+          count(*) filter (where saldo > 0 and estoque_minimo > 0 and saldo <= estoque_minimo)::int as baixo
+        from v_estoque where ativo`
     : [];
 
   return (
@@ -51,6 +60,25 @@ export default async function PainelPage({ searchParams }: { searchParams: { "se
               alerta={n.atrasadas > 0}
             />
             <Numero href="/iluminacao?situacao=executada" valor={n.executadas_mes} texto="executadas este mês" />
+          </div>
+        </Cartao>
+      )}
+
+      {e && (
+        <Cartao className="mt-4">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <Boxes className="h-5 w-5 text-marca-600" />
+            <h2 className="mr-auto font-semibold">Estoque</h2>
+            {pode(eu.papel, "movimentarEstoque") && (
+              <Link href="/estoque/entrada" className={classeBotao("secundario")}>
+                <ArrowDownToLine className="h-4 w-4" />
+                Dar entrada
+              </Link>
+            )}
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <Numero href="/estoque?ver=sem" valor={e.sem} texto="materiais sem estoque" alerta={e.sem > 0} />
+            <Numero href="/estoque?ver=baixo" valor={e.baixo} texto="acabando (no mínimo)" alerta={e.baixo > 0} />
           </div>
         </Cartao>
       )}
