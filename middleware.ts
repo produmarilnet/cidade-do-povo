@@ -10,6 +10,8 @@ export function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
+// Imagem da pasta public (a logo da prefeitura) passa sem sessão: ela aparece
+// na própria tela de login.
 export const config = {
-  matcher: ["/((?!login|primeiro-acesso|api/versao|_next|favicon.ico|icon.svg).*)"],
+  matcher: ["/((?!login|primeiro-acesso|api/versao|_next|favicon.ico|icon.svg|.*\\.(?:png|jpg|jpeg|svg|webp)$).*)"],
 };
