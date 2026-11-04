@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
   ArrowDownToLine,
   Boxes,
+  FileBarChart,
   LayoutDashboard,
   Lightbulb,
   LogOut,
@@ -32,6 +33,7 @@ export type GrupoMenu = { titulo?: string; itens: ItemMenu[] };
 const ICONES = {
   painel: LayoutDashboard,
   iluminacao: Lightbulb,
+  relatorios: FileBarChart,
   estoque: Boxes,
   entrada: ArrowDownToLine,
   materiais: Package,

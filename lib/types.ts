@@ -38,6 +38,10 @@ export type OrdemServico = {
   material: string | null;
   data_execucao: string | null; // AAAA-MM-DD
   observacoes: string | null;
+  // migration 0004 — as ordens antigas vêm sem localidade e sem equipe
+  localidade: string | null; // "Sede" ou o nome do povoado
+  equipe: string | null;
+  servico_executado: string | null; // o que foi feito (pode diferir do pedido)
 };
 
 /** "un" = peça; "m" = metro (cabo). */

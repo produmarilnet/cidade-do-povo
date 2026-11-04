@@ -29,7 +29,8 @@ export default async function OrdensPage({ searchParams }: { searchParams: { sit
     select * from ordens_servico
     where (${situacao} = 'todas' or situacao = ${situacao})
       and (${busca} = '' or nome ilike ${padrao} or apelido ilike ${padrao} or endereco ilike ${padrao}
-           or ponto_referencia ilike ${padrao} or telefone ilike ${padrao} or numero::text = ${busca.replace(/^0+/, "")})
+           or ponto_referencia ilike ${padrao} or telefone ilike ${padrao} or localidade ilike ${padrao}
+           or numero::text = ${busca.replace(/^0+/, "")})
     order by criado_em desc
     limit 200`;
 
@@ -109,6 +110,7 @@ export default async function OrdensPage({ searchParams }: { searchParams: { sit
                     <div className="truncate text-sm text-stone-600">
                       {o.endereco}
                       {o.numero_casa && `, ${o.numero_casa}`}
+                      {o.localidade && <span className="text-stone-400"> · {o.localidade}</span>}
                     </div>
                     <div className="truncate text-sm text-stone-500">{o.servico}</div>
                   </div>

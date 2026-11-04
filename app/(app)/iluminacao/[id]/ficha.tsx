@@ -45,12 +45,16 @@ function Linhas({ rotulo, linhas, valor }: { rotulo: string; linhas: number; val
  * Registrado: a lista do que foi usado, também em duas colunas.
  */
 function Materiais({ itens, texto }: { itens: MaterialDaOrdem[] | null; texto: string | null }) {
-  const registrado = itens !== null && (itens.length > 0 || !!texto);
+  // itens = null: a ordem ainda não foi baixada, vai com as linhas em branco
+  const registrado = itens !== null;
   return (
     <div className="mt-1.5">
       <RotuloExecucao>Material aplicado</RotuloExecucao>
       {registrado ? (
         <>
+          {itens.length === 0 && !texto && (
+            <div className="border-b border-stone-400 text-[13px] leading-6 text-stone-500">Nenhum material</div>
+          )}
           {itens.length > 0 && (
             <ul className="grid grid-cols-2 gap-x-4 border-b border-stone-400 text-[13px] leading-6">
               {itens.map((m, i) => (
@@ -116,7 +120,8 @@ export function Ficha({ ordem, materiais }: { ordem: OrdemServico; materiais: Ma
           <Dado rotulo="Nome" valor={ordem.nome} className="col-span-2 border-r" />
           <Dado rotulo="Apelido" valor={ordem.apelido} className="border-r" />
           <Dado rotulo="Telefone" valor={ordem.telefone} />
-          <Dado rotulo="Endereço" valor={ordem.endereco} className="col-span-3 border-r" />
+          <Dado rotulo="Endereço" valor={ordem.endereco} className="col-span-2 border-r" />
+          <Dado rotulo="Localidade" valor={ordem.localidade} className="border-r" />
           <Dado rotulo="Nº da casa" valor={ordem.numero_casa} />
           <Dado rotulo="Ponto de referência" valor={ordem.ponto_referencia} className="col-span-3 border-r" />
           <Dado rotulo="Atendente" valor={ordem.atendente} />
@@ -131,9 +136,10 @@ export function Ficha({ ordem, materiais }: { ordem: OrdemServico; materiais: Ma
         </div>
 
         <div className="grid grid-cols-4 gap-x-4">
-          <div className="col-span-3">
+          <div className="col-span-2">
             <Linhas rotulo="Eletricista executor" linhas={1} valor={ordem.eletricista} />
           </div>
+          <Linhas rotulo="Equipe" linhas={1} valor={executada ? ordem.equipe || "—" : null} />
           <div className="mt-1.5">
             <RotuloExecucao>Data</RotuloExecucao>
             {executada && ordem.data_execucao ? (

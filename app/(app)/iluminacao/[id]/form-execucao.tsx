@@ -1,7 +1,9 @@
 "use client";
 
+import { Atalhos } from "@/components/atalhos";
 import { Assistente, Passo } from "@/components/assistente";
 import { AreaTexto, Campo, Rotulo } from "@/components/ui";
+import { SERVICOS_COMUNS } from "@/lib/iluminacao";
 import type { Resultado } from "@/lib/resultado";
 import type { Material, MaterialDaOrdem, OrdemServico } from "@/lib/types";
 import { EscolherMateriais } from "@/components/escolher-materiais";
@@ -11,6 +13,7 @@ export function FormExecucao({
   ordem,
   acao,
   eletricistas,
+  equipes,
   materiais,
   materiaisDaOrdem,
   saldos,
@@ -20,6 +23,8 @@ export function FormExecucao({
   acao: (anterior: Resultado, dados: FormData) => Promise<Resultado>;
   /** Nomes já usados e usuários eletricistas — aparecem como sugestão no campo. */
   eletricistas: string[];
+  /** Equipes já usadas, as mais frequentes primeiro. */
+  equipes: string[];
   /** O banco de materiais (só os ativos). */
   materiais: Material[];
   /** O que já foi registrado nesta ordem — ao corrigir a baixa. */
@@ -40,6 +45,24 @@ export function FormExecucao({
             <option key={n} value={n} />
           ))}
         </datalist>
+        <Rotulo texto="Equipe (opcional)">
+          <Campo name="equipe" list="equipes" defaultValue={ordem.equipe ?? ""} placeholder="Ex.: Equipe 1" autoComplete="off" />
+        </Rotulo>
+        <datalist id="equipes">
+          {equipes.map((n) => (
+            <option key={n} value={n} />
+          ))}
+        </datalist>
+        <Atalhos campo="equipe" opcoes={equipes.slice(0, 8)} className="-mt-1" />
+      </Passo>
+      <Passo
+        titulo="Serviço executado"
+        dica="O que foi feito de verdade — já vem o que foi pedido. Se foi outra coisa, toque ou escreva."
+      >
+        <Atalhos campo="servico_executado" opcoes={SERVICOS_COMUNS} />
+        <Rotulo texto="Serviço executado">
+          <AreaTexto name="servico_executado" rows={3} defaultValue={ordem.servico_executado ?? ordem.servico} required />
+        </Rotulo>
       </Passo>
       <Passo
         titulo="Material aplicado"

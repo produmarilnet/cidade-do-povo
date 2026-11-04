@@ -55,6 +55,13 @@ export default async function OrdemPage({
           order by 1`
       ).map((l) => l.nome)
     : [];
+  const equipes = podeRegistrar
+    ? (
+        await sql<{ equipe: string }[]>`
+          select equipe from ordens_servico where equipe is not null
+          group by equipe order by count(*) desc, equipe`
+      ).map((l) => l.equipe)
+    : [];
 
   return (
     <>
@@ -104,6 +111,7 @@ export default async function OrdemPage({
               ordem={ordem}
               acao={registrarExecucao.bind(null, ordem.id)}
               eletricistas={eletricistas}
+              equipes={equipes}
               materiais={materiais}
               materiaisDaOrdem={materiaisDaOrdem}
               saldos={saldos}
