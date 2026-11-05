@@ -14,6 +14,12 @@ export const PODE = {
   verEstoque: ["admin", "atendente", "eletricista", "visualizador"],
   // dar entrada de material e acertar o saldo pela contagem
   movimentarEstoque: ["admin", "atendente"],
+  // ver a lista, o mapa e a ficha dos postes
+  verPostes: ["admin", "atendente", "eletricista", "visualizador"],
+  // marcar o poste pelo GPS na rua e corrigir o cadastro
+  cadastrarPostes: ["admin", "atendente", "eletricista"],
+  // gerar lote de etiquetas e desativar poste
+  gerenciarPostes: ["admin", "atendente"],
 } satisfies Record<string, readonly Papel[]>;
 
 export type Permissao = keyof typeof PODE;

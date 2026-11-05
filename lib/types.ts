@@ -43,6 +43,22 @@ export type OrdemServico = {
   equipe: string | null;
   servico_executado: string | null; // o que foi feito (pode diferir do pedido)
   bairro: string | null; // migration 0005 — opcional: povoado nem sempre tem bairro
+  poste_id: string | null; // migration 0006 — a ordem pode dizer de qual poste é
+};
+
+/** Poste da cidade (migration 0006). Sem cadastrado_em: etiqueta impressa, ainda sem localização. */
+export type Poste = {
+  id: string;
+  numero: number;
+  latitude: number | null;
+  longitude: number | null;
+  precisao: number | null; // ± metros do GPS na hora de marcar
+  localidade: string | null;
+  bairro: string | null;
+  endereco: string | null;
+  ponto_referencia: string | null;
+  ativo: boolean;
+  cadastrado_em: Date | null;
 };
 
 /** "un" = peça; "m" = metro (cabo). */

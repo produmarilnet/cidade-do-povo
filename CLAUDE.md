@@ -65,6 +65,31 @@ Recanto). Módulos entram aos poucos; o primeiro é o de iluminação pública.
     dentro do endereço (ordens antigas) parte a rua em outro grupo: não separar
     automaticamente sem perguntar.
 
+- **Postes com QR Code** (`/postes`, `lib/postes.ts`, migration 0006, pedido de 05/11/2026).
+  Cada poste tem um número, que é o da etiqueta, e o QR leva a `/p/<numero>`.
+  - **O domínio vai gravado no QR** (`ENDERECO_DO_SITE`): mudar o domínio do sistema deixa
+    as etiquetas que já estão na rua apontando para o lugar errado.
+  - **Dois jeitos de nascer:** o lote de `/postes/etiquetas` cria só os números
+    (`cadastrado_em` nulo). A etiqueta vai colada no poste e o cadastro se completa lendo o
+    QR na rua. O `/postes/novo` já nasce com a localização, e a etiqueta sai depois pela ficha.
+  - **`/p/<numero>` é a única tela aberta do sistema** (liberada no `middleware.ts`). Quem
+    tem login cai na ficha; quem não tem vê só o que já está escrito na etiqueta. Rua, GPS e
+    ordens não aparecem ali. O dono ainda não decidiu se o morador pode pedir conserto por
+    essa tela; não abrir nada sem ele pedir. Quando pedir, as etiquetas não mudam.
+  - **Etiqueta:** quadrado de 6 × 6 cm, 12 por folha A4 (escolha do dono), QR de 42 mm. Só
+    sai etiqueta de número que existe. A quebra de folha fica antes da folha, nunca depois:
+    depois da última sairia uma página em branco.
+  - **GPS** (`components/leitura-gps.tsx`, `lib/gps.ts`): modelo do Medir cerca do PRODUMAR.
+    No cadastro, quem segura o "Continuar" sem GPS é uma caixinha escondida com
+    `setCustomValidity`. Ela não pode ser `readOnly`, porque o navegador deixa de conferir.
+  - **Ordem:** `ordens_servico.poste_id`, pelo campo opcional "Nº do poste". A ficha do poste
+    abre a ordem com o endereço preenchido. Na ficha impressa o poste sai na linha da data,
+    para não crescer.
+  - **Leitor no site** (`/postes/ler`): `jsqr`, porque o Safari não tem leitor de QR próprio.
+    Mapa: Leaflet com OpenStreetMap, em canvas. Localidades e bairros sugeridos juntam
+    ordens e postes.
+  - Poste sai de uso desativado, nunca apagado: a etiqueta pode estar na rua.
+
 ## Stack e decisões
 
 - Next.js 14 App Router · TypeScript · Tailwind · Postgres puro com o driver `postgres`.

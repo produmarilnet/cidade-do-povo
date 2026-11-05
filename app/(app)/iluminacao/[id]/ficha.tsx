@@ -1,5 +1,6 @@
 import { Marca } from "@/components/marca";
 import { dataHoraDaFicha, numeroDaOrdem, quantidadeComUnidade } from "@/lib/iluminacao";
+import { numeroDoPoste } from "@/lib/postes";
 import type { MaterialDaOrdem, OrdemServico } from "@/lib/types";
 import { cn, formatarData } from "@/lib/utils";
 
@@ -89,7 +90,15 @@ function Materiais({ itens, texto }: { itens: MaterialDaOrdem[] | null; texto: s
   );
 }
 
-export function Ficha({ ordem, materiais }: { ordem: OrdemServico; materiais: MaterialDaOrdem[] }) {
+export function Ficha({
+  ordem,
+  materiais,
+  posteNumero,
+}: {
+  ordem: OrdemServico;
+  materiais: MaterialDaOrdem[];
+  posteNumero?: number | null;
+}) {
   const executada = ordem.situacao === "executada";
   return (
     <article className="ficha bg-white text-stone-900">
@@ -103,6 +112,14 @@ export function Ficha({ ordem, materiais }: { ordem: OrdemServico; materiais: Ma
           </div>
           <div className="text-lg font-bold tabular-nums">Nº {numeroDaOrdem(ordem.numero)}</div>
           <div className="text-xs">
+            {/* na mesma linha da data: a ficha não pode crescer, cabe em meia folha */}
+            {posteNumero != null && (
+              <>
+                <span className="text-stone-500">Poste: </span>
+                <span className="font-medium tabular-nums">{numeroDoPoste(posteNumero)}</span>
+                <span className="text-stone-400"> · </span>
+              </>
+            )}
             <span className="text-stone-500">Data: </span>
             <span className="font-medium">{dataHoraDaFicha(ordem.criado_em)}</span>
           </div>

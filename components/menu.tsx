@@ -15,6 +15,7 @@ import {
   RefreshCw,
   UserCog,
   Users,
+  UtilityPole,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -33,6 +34,7 @@ export type GrupoMenu = { titulo?: string; itens: ItemMenu[] };
 const ICONES = {
   painel: LayoutDashboard,
   iluminacao: Lightbulb,
+  postes: UtilityPole,
   relatorios: FileBarChart,
   estoque: Boxes,
   entrada: ArrowDownToLine,

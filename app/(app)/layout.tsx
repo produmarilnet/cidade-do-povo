@@ -17,6 +17,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       titulo: "Iluminação pública",
       itens: [
         { href: "/iluminacao", texto: "Ordens de serviço", icone: "iluminacao" },
+        { href: "/postes", texto: "Postes", icone: "postes" },
         { href: "/relatorios", texto: "Relatórios", icone: "relatorios" },
       ],
     });

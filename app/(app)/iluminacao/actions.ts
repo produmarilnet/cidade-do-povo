@@ -6,6 +6,7 @@ import { z } from "zod";
 import { sql } from "@/lib/db";
 import { exigirUsuario } from "@/lib/auth";
 import { bairroDoBanco, localidadeDoBanco } from "@/lib/localidades";
+import { lerNumeroDoPoste } from "@/lib/postes";
 import { erroDeValidacao, type Resultado } from "@/lib/resultado";
 
 // Campo opcional vazio vira null no banco.
@@ -52,20 +53,32 @@ async function lerPedido(dados: FormData) {
   return lido;
 }
 
+/** O poste digitado na ordem, que é opcional. Número que não existe é erro: pode ser engano. */
+async function lerPoste(dados: FormData): Promise<{ id: string | null } | { erro: string }> {
+  const texto = String(dados.get("poste") ?? "").trim();
+  if (!texto) return { id: null };
+  const numero = lerNumeroDoPoste(texto);
+  const [poste] = numero !== null ? await sql<{ id: string }[]>`select id from postes where numero = ${numero}` : [];
+  return poste ?? { erro: `Não existe poste com o número ${texto}.` };
+}
+
 /** Abre a ordem. A data da ficha é a hora em que foi salva (o banco preenche). */
 export async function abrirOrdem(_: Resultado, dados: FormData): Promise<Resultado> {
   const eu = await exigirUsuario("abrirOrdens");
   const lido = await lerPedido(dados);
   if (!lido.success) return erroDeValidacao(lido.error);
+  const poste = await lerPoste(dados);
+  if ("erro" in poste) return { ok: false, erro: poste.erro };
   const p = lido.data;
   const [{ id }] = await sql<{ id: string }[]>`
     insert into ordens_servico
-      (nome, apelido, telefone, localidade, bairro, endereco, numero_casa, ponto_referencia, servico, atendente, criado_por)
+      (nome, apelido, telefone, localidade, bairro, endereco, numero_casa, ponto_referencia, servico, atendente, criado_por, poste_id)
     values
       (${p.nome}, ${p.apelido}, ${p.telefone}, ${p.localidade}, ${p.bairro}, ${p.endereco}, ${p.numero_casa},
-       ${p.ponto_referencia}, ${p.servico}, ${p.atendente}, ${eu.id})
+       ${p.ponto_referencia}, ${p.servico}, ${p.atendente}, ${eu.id}, ${poste.id})
     returning id`;
   revalidatePath("/iluminacao");
+  revalidatePath("/postes", "layout");
   redirect(`/iluminacao/${id}?nova=1`);
 }
 
@@ -74,15 +87,18 @@ export async function corrigirOrdem(id: string, _: Resultado, dados: FormData): 
   await exigirUsuario("abrirOrdens");
   const lido = await lerPedido(dados);
   if (!lido.success) return erroDeValidacao(lido.error);
+  const poste = await lerPoste(dados);
+  if ("erro" in poste) return { ok: false, erro: poste.erro };
   const p = lido.data;
   await sql`
     update ordens_servico set
       nome = ${p.nome}, apelido = ${p.apelido}, telefone = ${p.telefone},
       localidade = ${p.localidade}, bairro = ${p.bairro}, endereco = ${p.endereco},
       numero_casa = ${p.numero_casa}, ponto_referencia = ${p.ponto_referencia}, servico = ${p.servico},
-      atendente = ${p.atendente}, atualizado_em = now()
+      atendente = ${p.atendente}, poste_id = ${poste.id}, atualizado_em = now()
     where id = ${id}`;
   revalidatePath("/iluminacao");
+  revalidatePath("/postes", "layout");
   redirect(`/iluminacao/${id}`);
 }
 

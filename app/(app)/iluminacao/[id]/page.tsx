@@ -5,6 +5,7 @@ import { exigirUsuario } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { pode } from "@/lib/permissoes";
 import { COR_SITUACAO, NOME_SITUACAO, numeroDaOrdem } from "@/lib/iluminacao";
+import { numeroDoPoste } from "@/lib/postes";
 import type { MaterialDaOrdem, OrdemServico, SaldoMaterial } from "@/lib/types";
 import { hoje } from "@/lib/utils";
 import { BotaoAcao } from "@/components/formulario";
@@ -23,7 +24,10 @@ export default async function OrdemPage({
 }) {
   const eu = await exigirUsuario("verIluminacao");
   // id que não é uuid faz o banco reclamar: trata como ordem que não existe.
-  const [ordem] = await sql<OrdemServico[]>`select * from ordens_servico where id = ${params.id}`.catch(() => []);
+  const [ordem] = await sql<(OrdemServico & { poste_numero: number | null })[]>`
+    select o.*, p.numero as poste_numero
+    from ordens_servico o left join postes p on p.id = o.poste_id
+    where o.id = ${params.id}`.catch(() => []);
   if (!ordem) notFound();
 
   const podeAbrir = pode(eu.papel, "abrirOrdens");
@@ -78,6 +82,11 @@ export default async function OrdemPage({
             Ordem nº {numeroDaOrdem(ordem.numero)}{" "}
             <Etiqueta cor={COR_SITUACAO[ordem.situacao]}>{NOME_SITUACAO[ordem.situacao]}</Etiqueta>
           </h1>
+          {ordem.poste_numero !== null && (
+            <Link href={`/postes/${ordem.poste_numero}`} className={classeBotao("secundario")}>
+              Poste {numeroDoPoste(ordem.poste_numero)}
+            </Link>
+          )}
           <BotaoImprimir texto="Imprimir ficha" />
           {podeAbrir && (
             <Link href={`/iluminacao/${ordem.id}/editar`} className={classeBotao("secundario")}>
@@ -94,7 +103,7 @@ export default async function OrdemPage({
       </div>
 
       <Cartao className="mb-6 p-6 print:border-0 print:p-0 print:shadow-none">
-        <Ficha ordem={ordem} materiais={materiaisDaOrdem} />
+        <Ficha ordem={ordem} materiais={materiaisDaOrdem} posteNumero={ordem.poste_numero} />
       </Cartao>
 
       <div className="flex flex-col gap-4 print:hidden">

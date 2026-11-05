@@ -11,7 +11,8 @@ export function middleware(req: NextRequest) {
 }
 
 // Imagem da pasta public (a logo da prefeitura) passa sem sessão: ela aparece
-// na própria tela de login.
+// na própria tela de login. O /p/ é para onde o QR do poste aponta: abre sem
+// login e mostra só o número da etiqueta.
 export const config = {
-  matcher: ["/((?!login|primeiro-acesso|api/versao|_next|favicon.ico|icon.svg|.*\\.(?:png|jpg|jpeg|svg|webp)$).*)"],
+  matcher: ["/((?!login|primeiro-acesso|p/|api/versao|_next|favicon.ico|icon.svg|.*\\.(?:png|jpg|jpeg|svg|webp)$).*)"],
 };

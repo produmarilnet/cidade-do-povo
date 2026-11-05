@@ -2,6 +2,7 @@
 
 import { Atalhos } from "@/components/atalhos";
 import { Passo } from "@/components/assistente";
+import { CamposLugar } from "@/components/campos-lugar";
 import { AreaTexto, Campo, Rotulo } from "@/components/ui";
 import { mascaraTelefone, SERVICOS_COMUNS } from "@/lib/iluminacao";
 import type { OrdemServico } from "@/lib/types";
@@ -9,11 +10,15 @@ import type { OrdemServico } from "@/lib/types";
 /** Os passos do pedido — iguais para abrir e para corrigir a ordem. */
 export function CamposOrdem({
   ordem,
+  posteNumero,
   atendente,
   localidades,
   bairros,
 }: {
-  ordem?: OrdemServico;
+  /** A ordem que está sendo corrigida, ou o endereço do poste na ordem nova. */
+  ordem?: Partial<OrdemServico>;
+  /** O nº do poste da ordem, ou o do poste de onde ela foi aberta. */
+  posteNumero?: number | null;
   atendente: string;
   /** "Sede" e os povoados já usados, os mais pedidos primeiro. */
   localidades: string[];
@@ -45,39 +50,17 @@ export function CamposOrdem({
       </Passo>
 
       <Passo titulo="Onde é">
-        {/* a localidade é o que separa sede e povoados no relatório */}
-        <Rotulo texto="Localidade">
+        <Rotulo texto="Nº do poste (opcional)">
           <Campo
-            name="localidade"
-            list="localidades"
-            defaultValue={ordem?.localidade ?? ""}
-            placeholder="Sede ou nome do povoado"
+            name="poste"
+            inputMode="numeric"
+            defaultValue={posteNumero ?? ""}
+            placeholder="O número da etiqueta, se tiver"
             autoComplete="off"
-            required
+            voz={false}
           />
         </Rotulo>
-        <datalist id="localidades">
-          {localidades.map((l) => (
-            <option key={l} value={l} />
-          ))}
-        </datalist>
-        <Atalhos campo="localidade" opcoes={localidades.slice(0, 12)} className="-mt-1" />
-        <Rotulo texto="Bairro (opcional)">
-          <Campo
-            name="bairro"
-            list="bairros"
-            defaultValue={ordem?.bairro ?? ""}
-            placeholder="Em branco se o povoado não tiver bairro"
-            autoComplete="off"
-            maxLength={80}
-          />
-        </Rotulo>
-        <datalist id="bairros">
-          {bairros.map((b) => (
-            <option key={b} value={b} />
-          ))}
-        </datalist>
-        <Atalhos campo="bairro" opcoes={bairros.slice(0, 12)} className="-mt-1" />
+        <CamposLugar localidade={ordem?.localidade} bairro={ordem?.bairro} localidades={localidades} bairros={bairros} />
         {/* só a rua: o relatório por rua agrupa por este campo */}
         <Rotulo texto="Endereço">
           <Campo name="endereco" defaultValue={ordem?.endereco} placeholder="Rua, avenida, travessa…" autoComplete="off" required />

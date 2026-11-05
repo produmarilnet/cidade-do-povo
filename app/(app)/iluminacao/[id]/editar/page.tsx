@@ -13,7 +13,10 @@ import { corrigirOrdem } from "../../actions";
 
 export default async function CorrigirOrdemPage({ params }: { params: { id: string } }) {
   const eu = await exigirUsuario("abrirOrdens");
-  const [ordem] = await sql<OrdemServico[]>`select * from ordens_servico where id = ${params.id}`.catch(() => []);
+  const [ordem] = await sql<(OrdemServico & { poste_numero: number | null })[]>`
+    select o.*, p.numero as poste_numero
+    from ordens_servico o left join postes p on p.id = o.poste_id
+    where o.id = ${params.id}`.catch(() => []);
   if (!ordem) notFound();
 
   return (
@@ -30,6 +33,7 @@ export default async function CorrigirOrdemPage({ params }: { params: { id: stri
         <Assistente acao={corrigirOrdem.bind(null, ordem.id)} textoBotao="Salvar correção" comecarNaConferencia>
           <CamposOrdem
             ordem={ordem}
+            posteNumero={ordem.poste_numero}
             atendente={eu.nome}
             localidades={await localidadesConhecidas()}
             bairros={await bairrosConhecidos()}
