@@ -2,30 +2,26 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { exigirUsuario } from "@/lib/auth";
 import { sql } from "@/lib/db";
-import { enderecoDoQr, ETIQUETAS_POR_FOLHA, ETIQUETAS_POR_LOTE, lerNumeroDoPoste, numeroDoPoste } from "@/lib/postes";
+import { enderecoDoQr, ETIQUETAS_POR_FOLHA, ETIQUETAS_POR_LOTE, lerNumeroDoPoste } from "@/lib/postes";
 import { cn } from "@/lib/utils";
 import { BotaoImprimir } from "@/components/imprimir";
 import { QrCode } from "@/components/qr-code";
 import { Aviso, Cartao, Titulo } from "@/components/ui";
 
 /**
- * Quadrado de 6 × 6 cm, que é o que o dono escolheu (12 por folha A4). O QR de
- * 4 cm lê a menos de 1 metro. A linha tracejada é a do corte.
+ * Quadrado de 6 × 6 cm, que é o que o dono escolheu (12 por folha A4). Ele pediu
+ * só o QR e o nome da Prefeitura: o número do poste e o endereço do site vão
+ * dentro do QR, nada disso sai escrito. A linha tracejada é a do corte.
  */
 function EtiquetaDoPoste({ numero }: { numero: number }) {
   return (
     <div className="flex h-[60mm] w-[60mm] flex-col items-center justify-between bg-white px-[2mm] py-[1.5mm] text-black outline-dashed outline-[0.2mm] outline-stone-400">
-      <div className="flex h-[7mm] items-center gap-[2mm]">
-        {/* eslint-disable-next-line @next/next/no-img-element -- imagem pequena e fixa, sai igual na impressão */}
-        <img src="/logo-prefeitura.png" alt="" className="h-[7mm] w-auto" />
-        <span className="text-[8pt] font-semibold leading-tight">
-          Luz com defeito?
-          <br />
-          Aponte a câmera
-        </span>
+      <QrCode texto={enderecoDoQr(numero)} className="h-[47mm] w-[47mm]" />
+      <div className="text-center text-[10pt] font-bold leading-tight">
+        Prefeitura de São Mateus
+        <br />
+        do Maranhão
       </div>
-      <QrCode texto={enderecoDoQr(numero)} className="h-[42mm] w-[42mm]" />
-      <div className="text-[13pt] font-bold leading-none tabular-nums">Poste {numeroDoPoste(numero)}</div>
     </div>
   );
 }

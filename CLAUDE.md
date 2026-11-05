@@ -80,9 +80,10 @@ Recanto). Módulos entram aos poucos; o primeiro é o de iluminação pública.
     `ATENDENTE_QR`, que é o que marca a ordem como vinda do QR (sem coluna nova). Freios:
     só poste cadastrado e ativo, um pedido aberto por poste, `PEDIDOS_QR_POR_HORA` para o
     sistema todo, telefone obrigatório. Não guarda IP.
-  - **Etiqueta:** quadrado de 6 × 6 cm, 12 por folha A4 (escolha do dono), QR de 42 mm. Só
-    sai etiqueta de número que existe. A quebra de folha fica antes da folha, nunca depois:
-    depois da última sairia uma página em branco.
+  - **Etiqueta:** quadrado de 6 × 6 cm, 12 por folha A4, QR de 47 mm. Pedido do dono: só o QR
+    e o nome da Prefeitura, sem logo, sem número e sem domínio escritos. Só sai etiqueta de
+    número que existe. A quebra de folha fica antes da folha, nunca depois: depois da última
+    sairia uma página em branco.
   - **GPS** (`components/leitura-gps.tsx`, `lib/gps.ts`): modelo do Medir cerca do PRODUMAR.
     No cadastro, quem segura o "Continuar" sem GPS é uma caixinha escondida com
     `setCustomValidity`. Ela não pode ser `readOnly`, porque o navegador deixa de conferir.
