@@ -11,11 +11,14 @@ export function CamposOrdem({
   ordem,
   atendente,
   localidades,
+  bairros,
 }: {
   ordem?: OrdemServico;
   atendente: string;
   /** "Sede" e os povoados já usados, os mais pedidos primeiro. */
   localidades: string[];
+  /** Os bairros já usados, os mais pedidos primeiro. */
+  bairros: string[];
 }) {
   return (
     <>
@@ -59,8 +62,25 @@ export function CamposOrdem({
           ))}
         </datalist>
         <Atalhos campo="localidade" opcoes={localidades.slice(0, 12)} className="-mt-1" />
+        <Rotulo texto="Bairro (opcional)">
+          <Campo
+            name="bairro"
+            list="bairros"
+            defaultValue={ordem?.bairro ?? ""}
+            placeholder="Em branco se o povoado não tiver bairro"
+            autoComplete="off"
+            maxLength={80}
+          />
+        </Rotulo>
+        <datalist id="bairros">
+          {bairros.map((b) => (
+            <option key={b} value={b} />
+          ))}
+        </datalist>
+        <Atalhos campo="bairro" opcoes={bairros.slice(0, 12)} className="-mt-1" />
+        {/* só a rua: o relatório por rua agrupa por este campo */}
         <Rotulo texto="Endereço">
-          <Campo name="endereco" defaultValue={ordem?.endereco} placeholder="Rua, travessa, bairro…" autoComplete="off" required />
+          <Campo name="endereco" defaultValue={ordem?.endereco} placeholder="Rua, avenida, travessa…" autoComplete="off" required />
         </Rotulo>
         <Rotulo texto="Número da casa (opcional)">
           <Campo name="numero_casa" defaultValue={ordem?.numero_casa ?? ""} placeholder="Ex.: 120 ou S/N" autoComplete="off" />

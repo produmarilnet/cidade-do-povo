@@ -184,6 +184,7 @@ export default async function RelatoriosPage({
                             {" · "}
                             {o.endereco}
                             {o.numero_casa && `, ${o.numero_casa}`}
+                            {o.bairro && `, ${o.bairro}`}
                             {o.localidade && ` (${o.localidade})`}
                             {" · "}
                             {o.servico_executado ?? o.servico}
@@ -216,6 +217,10 @@ function rotuloDoGrupo(tipo: TipoRelatorio): string {
       return "Data de solicitação";
     case "localidade":
       return "Localidade";
+    case "bairro":
+      return "Bairro";
+    case "rua":
+      return "Rua";
     case "equipe":
       return "Equipe";
     case "solicitante":

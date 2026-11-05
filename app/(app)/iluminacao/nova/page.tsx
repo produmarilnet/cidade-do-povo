@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { exigirUsuario } from "@/lib/auth";
-import { localidadesConhecidas } from "@/lib/localidades";
+import { bairrosConhecidos, localidadesConhecidas } from "@/lib/localidades";
 import { Assistente } from "@/components/assistente";
 import { Cartao, Titulo } from "@/components/ui";
 import { CamposOrdem } from "../campos-ordem";
@@ -18,7 +18,7 @@ export default async function NovaOrdemPage() {
       <Titulo>Nova ordem de serviço</Titulo>
       <Cartao className="max-w-xl">
         <Assistente acao={abrirOrdem} textoBotao="Abrir ordem">
-          <CamposOrdem atendente={eu.nome} localidades={await localidadesConhecidas()} />
+          <CamposOrdem atendente={eu.nome} localidades={await localidadesConhecidas()} bairros={await bairrosConhecidos()} />
         </Assistente>
       </Cartao>
     </>

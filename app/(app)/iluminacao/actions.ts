@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { sql } from "@/lib/db";
 import { exigirUsuario } from "@/lib/auth";
-import { localidadeDoBanco } from "@/lib/localidades";
+import { bairroDoBanco, localidadeDoBanco } from "@/lib/localidades";
 import { erroDeValidacao, type Resultado } from "@/lib/resultado";
 
 // Campo opcional vazio vira null no banco.
@@ -19,6 +19,11 @@ const esquemaPedido = z.object({
   apelido: opcional,
   telefone: opcional,
   localidade: z.string().trim().min(2, "Informe a localidade: Sede ou o nome do povoado.").max(80),
+  bairro: z
+    .string()
+    .trim()
+    .max(80, "O nome do bairro está grande demais.")
+    .transform((v) => v || null),
   endereco: z.string().trim().min(3, "Informe o endereço."),
   numero_casa: opcional,
   ponto_referencia: opcional,
@@ -32,14 +37,18 @@ async function lerPedido(dados: FormData) {
     apelido: dados.get("apelido") ?? "",
     telefone: dados.get("telefone") ?? "",
     localidade: dados.get("localidade") ?? "",
+    bairro: dados.get("bairro") ?? "",
     endereco: dados.get("endereco") ?? "",
     numero_casa: dados.get("numero_casa") ?? "",
     ponto_referencia: dados.get("ponto_referencia") ?? "",
     servico: dados.get("servico") ?? "",
     atendente: dados.get("atendente") ?? "",
   });
-  // o mesmo povoado escrito de outro jeito fica com a grafia que já existe
-  if (lido.success) lido.data.localidade = await localidadeDoBanco(lido.data.localidade);
+  // o mesmo povoado ou bairro escrito de outro jeito fica com a grafia que já existe
+  if (lido.success) {
+    lido.data.localidade = await localidadeDoBanco(lido.data.localidade);
+    if (lido.data.bairro) lido.data.bairro = await bairroDoBanco(lido.data.bairro);
+  }
   return lido;
 }
 
@@ -51,9 +60,9 @@ export async function abrirOrdem(_: Resultado, dados: FormData): Promise<Resulta
   const p = lido.data;
   const [{ id }] = await sql<{ id: string }[]>`
     insert into ordens_servico
-      (nome, apelido, telefone, localidade, endereco, numero_casa, ponto_referencia, servico, atendente, criado_por)
+      (nome, apelido, telefone, localidade, bairro, endereco, numero_casa, ponto_referencia, servico, atendente, criado_por)
     values
-      (${p.nome}, ${p.apelido}, ${p.telefone}, ${p.localidade}, ${p.endereco}, ${p.numero_casa},
+      (${p.nome}, ${p.apelido}, ${p.telefone}, ${p.localidade}, ${p.bairro}, ${p.endereco}, ${p.numero_casa},
        ${p.ponto_referencia}, ${p.servico}, ${p.atendente}, ${eu.id})
     returning id`;
   revalidatePath("/iluminacao");
@@ -69,7 +78,7 @@ export async function corrigirOrdem(id: string, _: Resultado, dados: FormData): 
   await sql`
     update ordens_servico set
       nome = ${p.nome}, apelido = ${p.apelido}, telefone = ${p.telefone},
-      localidade = ${p.localidade}, endereco = ${p.endereco},
+      localidade = ${p.localidade}, bairro = ${p.bairro}, endereco = ${p.endereco},
       numero_casa = ${p.numero_casa}, ponto_referencia = ${p.ponto_referencia}, servico = ${p.servico},
       atendente = ${p.atendente}, atualizado_em = now()
     where id = ${id}`;

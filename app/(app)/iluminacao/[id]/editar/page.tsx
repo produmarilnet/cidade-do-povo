@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { exigirUsuario } from "@/lib/auth";
-import { localidadesConhecidas } from "@/lib/localidades";
+import { bairrosConhecidos, localidadesConhecidas } from "@/lib/localidades";
 import { sql } from "@/lib/db";
 import { numeroDaOrdem } from "@/lib/iluminacao";
 import type { OrdemServico } from "@/lib/types";
@@ -28,7 +28,12 @@ export default async function CorrigirOrdemPage({ params }: { params: { id: stri
       <Titulo>Corrigir o pedido</Titulo>
       <Cartao className="max-w-xl">
         <Assistente acao={corrigirOrdem.bind(null, ordem.id)} textoBotao="Salvar correção" comecarNaConferencia>
-          <CamposOrdem ordem={ordem} atendente={eu.nome} localidades={await localidadesConhecidas()} />
+          <CamposOrdem
+            ordem={ordem}
+            atendente={eu.nome}
+            localidades={await localidadesConhecidas()}
+            bairros={await bairrosConhecidos()}
+          />
         </Assistente>
       </Cartao>
     </>

@@ -30,7 +30,7 @@ export default async function OrdensPage({ searchParams }: { searchParams: { sit
     where (${situacao} = 'todas' or situacao = ${situacao})
       and (${busca} = '' or nome ilike ${padrao} or apelido ilike ${padrao} or endereco ilike ${padrao}
            or ponto_referencia ilike ${padrao} or telefone ilike ${padrao} or localidade ilike ${padrao}
-           or numero::text = ${busca.replace(/^0+/, "")})
+           or bairro ilike ${padrao} or numero::text = ${busca.replace(/^0+/, "")})
     order by criado_em desc
     limit 200`;
 
@@ -78,7 +78,7 @@ export default async function OrdensPage({ searchParams }: { searchParams: { sit
           <input
             name="busca"
             defaultValue={busca}
-            placeholder="Buscar por nome, apelido, endereço, telefone ou nº"
+            placeholder="Buscar por nome, apelido, endereço, bairro, telefone ou nº"
             className="h-10 w-full rounded-lg border border-stone-300 bg-white pl-9 pr-3 text-base text-stone-900 focus:border-marca-500 focus:outline-none focus:ring-2 focus:ring-marca-200 sm:text-sm"
           />
         </div>
@@ -110,6 +110,7 @@ export default async function OrdensPage({ searchParams }: { searchParams: { sit
                     <div className="truncate text-sm text-stone-600">
                       {o.endereco}
                       {o.numero_casa && `, ${o.numero_casa}`}
+                      {o.bairro && ` · ${o.bairro}`}
                       {o.localidade && <span className="text-stone-400"> · {o.localidade}</span>}
                     </div>
                     <div className="truncate text-sm text-stone-500">{o.servico}</div>

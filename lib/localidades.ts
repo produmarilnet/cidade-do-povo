@@ -33,3 +33,20 @@ export async function localidadeDoBanco(texto: string): Promise<string> {
   const conhecidas = await localidadesConhecidas();
   return conhecidas.find((l) => chave(l) === chave(limpo)) ?? limpo;
 }
+
+/** Os bairros já usados, os mais pedidos primeiro. */
+export async function bairrosConhecidos(): Promise<string[]> {
+  const linhas = await sql<{ bairro: string }[]>`
+    select bairro from ordens_servico
+    where bairro is not null
+    group by bairro
+    order by count(*) desc, bairro`;
+  return linhas.map((l) => l.bairro);
+}
+
+/** Igual à localidade: o mesmo bairro escrito de outro jeito fica com a grafia que já existe. */
+export async function bairroDoBanco(texto: string): Promise<string> {
+  const limpo = texto.replace(/\s+/g, " ").trim();
+  const conhecidos = await bairrosConhecidos();
+  return conhecidos.find((b) => chave(b) === chave(limpo)) ?? limpo;
+}

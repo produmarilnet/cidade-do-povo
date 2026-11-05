@@ -42,6 +42,7 @@ export type OrdemServico = {
   localidade: string | null; // "Sede" ou o nome do povoado
   equipe: string | null;
   servico_executado: string | null; // o que foi feito (pode diferir do pedido)
+  bairro: string | null; // migration 0005 — opcional: povoado nem sempre tem bairro
 };
 
 /** "un" = peça; "m" = metro (cabo). */

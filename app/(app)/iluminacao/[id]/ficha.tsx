@@ -121,9 +121,10 @@ export function Ficha({ ordem, materiais }: { ordem: OrdemServico; materiais: Ma
           <Dado rotulo="Apelido" valor={ordem.apelido} className="border-r" />
           <Dado rotulo="Telefone" valor={ordem.telefone} />
           <Dado rotulo="Endereço" valor={ordem.endereco} className="col-span-2 border-r" />
+          <Dado rotulo="Nº da casa" valor={ordem.numero_casa} className="border-r" />
+          <Dado rotulo="Bairro" valor={ordem.bairro} />
           <Dado rotulo="Localidade" valor={ordem.localidade} className="border-r" />
-          <Dado rotulo="Nº da casa" valor={ordem.numero_casa} />
-          <Dado rotulo="Ponto de referência" valor={ordem.ponto_referencia} className="col-span-3 border-r" />
+          <Dado rotulo="Ponto de referência" valor={ordem.ponto_referencia} className="col-span-2 border-r" />
           <Dado rotulo="Atendente" valor={ordem.atendente} />
           <Dado rotulo="Serviço solicitado" valor={ordem.servico} className="col-span-4 border-b-0" />
         </div>

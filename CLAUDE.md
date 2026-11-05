@@ -46,17 +46,24 @@ Recanto). Módulos entram aos poucos; o primeiro é o de iluminação pública.
     redireciona). O seletor com quantidade (`components/escolher-materiais.tsx`)
     serve para a baixa e para a entrada.
 
-- **Relatórios** (`/relatorios`, `lib/relatorios.ts`, migration 0004): 8 tipos, pedidos
-  pelo setor em 04/11/2026.
+- **Relatórios** (`/relatorios`, `lib/relatorios.ts`, migration 0004): 10 tipos, pedidos
+  pelo setor em 04/11/2026 (por bairro e por rua vieram em 05/11/2026).
   - Os de **execução** (serviço executado, material usado, data de execução, equipe)
     olham só as ordens executadas, pela `data_execucao`.
-  - Os de **pedido** (data de solicitação, localidade, solicitante, concluídos e não
-    concluídos) olham as ordens abertas no período, pela data da ficha, com filtro
-    de situação.
+  - Os de **pedido** (data de solicitação, localidade, bairro, rua, solicitante,
+    concluídos e não concluídos) olham as ordens abertas no período, pela data da
+    ficha, com filtro de situação.
   - Os grupos juntam o mesmo texto escrito diferente (maiúscula, acento, espaço).
   - Campos que vieram para isso: `localidade` (obrigatória ao abrir a ordem: "Sede" ou
     o povoado), `equipe` e `servico_executado` (na baixa). `lib/localidades.ts`
     reaproveita a grafia de uma localidade que já existe.
+  - `bairro` (migration 0005) é opcional, porque povoado nem sempre tem bairro, e
+    reaproveita a grafia igual à localidade. Ordem sem bairro cai em "Bairro não
+    informado".
+  - O relatório por rua agrupa pelo campo `endereco` junto com a localidade, porque
+    a "Rua Principal" da sede e a do povoado são ruas diferentes. Bairro escrito
+    dentro do endereço (ordens antigas) parte a rua em outro grupo: não separar
+    automaticamente sem perguntar.
 
 ## Stack e decisões
 

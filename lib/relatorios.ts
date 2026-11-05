@@ -8,8 +8,8 @@ import type { SituacaoOrdem, UnidadeMaterial } from "./types";
 // Cada relatório é um agrupamento das ordens do período. Os que falam do que
 // foi FEITO (serviço executado, material, data de execução, equipe) olham só as
 // ordens executadas, pela data de execução. Os que falam do PEDIDO (data de
-// solicitação, localidade, solicitante, concluídos e não concluídos) olham
-// todas as ordens abertas no período, pela data de solicitação.
+// solicitação, localidade, bairro, rua, solicitante, concluídos e não
+// concluídos) olham todas as ordens abertas no período, pela data de solicitação.
 
 export const TIPOS_RELATORIO = [
   { tipo: "servico", titulo: "Por serviço executado", base: "execucao" },
@@ -17,6 +17,8 @@ export const TIPOS_RELATORIO = [
   { tipo: "execucao", titulo: "Por data de execução", base: "execucao" },
   { tipo: "solicitacao", titulo: "Por data de solicitação", base: "solicitacao" },
   { tipo: "localidade", titulo: "Por localidade (sede ou povoado)", base: "solicitacao" },
+  { tipo: "bairro", titulo: "Por bairro", base: "solicitacao" },
+  { tipo: "rua", titulo: "Por rua", base: "solicitacao" },
   { tipo: "equipe", titulo: "Por equipe", base: "execucao" },
   { tipo: "solicitante", titulo: "Por nome do solicitante", base: "solicitacao" },
   { tipo: "situacao", titulo: "Concluídos e não concluídos", base: "solicitacao" },
@@ -46,6 +48,7 @@ export type OrdemDoRelatorio = {
   numero: number;
   nome: string;
   localidade: string | null;
+  bairro: string | null;
   endereco: string;
   numero_casa: string | null;
   servico: string;
@@ -111,7 +114,7 @@ export async function gerarRelatorio(
   const situacoes = base === "execucao" ? ["executada"] : SITUACAO_DO_FILTRO[filtro];
 
   const ordens = await sql<OrdemDoRelatorio[]>`
-    select id, numero, nome, localidade, endereco, numero_casa, servico, servico_executado,
+    select id, numero, nome, localidade, bairro, endereco, numero_casa, servico, servico_executado,
            situacao, eletricista, equipe, data_execucao, criado_em
     from ordens_servico
     where situacao in ${sql(situacoes)}
@@ -138,6 +141,15 @@ export async function gerarRelatorio(
       break;
     case "localidade":
       grupos = agrupar(ordens, (o) => o.localidade ?? "Localidade não informada").sort(maisOrdensPrimeiro);
+      break;
+    case "bairro":
+      grupos = agrupar(ordens, (o) => o.bairro ?? "Bairro não informado").sort(maisOrdensPrimeiro);
+      break;
+    case "rua":
+      // "Rua Principal" da sede e a do povoado são ruas diferentes
+      grupos = agrupar(ordens, (o) => (o.localidade ? `${o.endereco} — ${o.localidade}` : o.endereco)).sort(
+        maisOrdensPrimeiro,
+      );
       break;
     case "equipe":
       grupos = agrupar(ordens, (o) => o.equipe ?? "Equipe não informada").sort(maisOrdensPrimeiro);
