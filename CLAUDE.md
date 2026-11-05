@@ -73,9 +73,13 @@ Recanto). Módulos entram aos poucos; o primeiro é o de iluminação pública.
     (`cadastrado_em` nulo). A etiqueta vai colada no poste e o cadastro se completa lendo o
     QR na rua. O `/postes/novo` já nasce com a localização, e a etiqueta sai depois pela ficha.
   - **`/p/<numero>` é a única tela aberta do sistema** (liberada no `middleware.ts`). Quem
-    tem login cai na ficha; quem não tem vê só o que já está escrito na etiqueta. Rua, GPS e
-    ordens não aparecem ali. O dono ainda não decidiu se o morador pode pedir conserto por
-    essa tela; não abrir nada sem ele pedir. Quando pedir, as etiquetas não mudam.
+    tem login cai na ficha; quem não tem vê só o número da etiqueta e o pedido de conserto
+    (decisão do dono, 05/11/2026). Rua, GPS e ordens não aparecem ali.
+  - **Pedido do morador** (`app/p/[numero]/actions.ts`): a única server action sem
+    `exigirUsuario`. Vira ordem aberta com o endereço do cadastro do poste e o atendente
+    `ATENDENTE_QR`, que é o que marca a ordem como vinda do QR (sem coluna nova). Freios:
+    só poste cadastrado e ativo, um pedido aberto por poste, `PEDIDOS_QR_POR_HORA` para o
+    sistema todo, telefone obrigatório. Não guarda IP.
   - **Etiqueta:** quadrado de 6 × 6 cm, 12 por folha A4 (escolha do dono), QR de 42 mm. Só
     sai etiqueta de número que existe. A quebra de folha fica antes da folha, nunca depois:
     depois da última sairia uma página em branco.

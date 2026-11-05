@@ -19,9 +19,9 @@ function EtiquetaDoPoste({ numero }: { numero: number }) {
         {/* eslint-disable-next-line @next/next/no-img-element -- imagem pequena e fixa, sai igual na impressão */}
         <img src="/logo-prefeitura.png" alt="" className="h-[7mm] w-auto" />
         <span className="text-[8pt] font-semibold leading-tight">
-          Iluminação
+          Luz com defeito?
           <br />
-          pública
+          Aponte a câmera
         </span>
       </div>
       <QrCode texto={enderecoDoQr(numero)} className="h-[42mm] w-[42mm]" />

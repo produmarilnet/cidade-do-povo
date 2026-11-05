@@ -3,7 +3,7 @@ import { Plus, Search } from "lucide-react";
 import { exigirUsuario } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { pode } from "@/lib/permissoes";
-import { COR_SITUACAO, dataDaFicha, NOME_SITUACAO, numeroDaOrdem } from "@/lib/iluminacao";
+import { ATENDENTE_QR, COR_SITUACAO, dataDaFicha, NOME_SITUACAO, numeroDaOrdem } from "@/lib/iluminacao";
 import { SITUACOES_ORDEM, type OrdemServico, type SituacaoOrdem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Cartao, Etiqueta, Titulo, classeBotao } from "@/components/ui";
@@ -106,6 +106,7 @@ export default async function OrdensPage({ searchParams }: { searchParams: { sit
                         {o.apelido && <span className="font-normal text-stone-500"> ({o.apelido})</span>}
                       </span>
                       <Etiqueta cor={COR_SITUACAO[o.situacao]}>{NOME_SITUACAO[o.situacao]}</Etiqueta>
+                      {o.atendente === ATENDENTE_QR && <Etiqueta cor="cinza">Pelo QR</Etiqueta>}
                     </div>
                     <div className="truncate text-sm text-stone-600">
                       {o.endereco}

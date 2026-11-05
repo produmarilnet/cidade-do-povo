@@ -63,6 +63,21 @@ export const SERVICOS_COMUNS = [
   "Troca de bomba submersa",
 ] as const;
 
+/** Os problemas que o morador vê ao pedir conserto pelo QR do poste. */
+export const PEDIDOS_DO_MORADOR = [
+  "Lâmpada queimada",
+  "Lâmpada acesa de dia",
+  "Luminária quebrada",
+  "Luminária virada",
+  "Cabo partido",
+] as const;
+
+/** O "atendente" das ordens pedidas pelo QR: é o que marca de onde a ordem veio. */
+export const ATENDENTE_QR = "QR Code (morador)";
+
+/** Freio contra trote em massa: pedidos pelo QR por hora, somando a cidade toda. */
+export const PEDIDOS_QR_POR_HORA = 30;
+
 /** "2 un" / "15 m" / "1,5 m" — a quantidade como sai na ficha. */
 export function quantidadeComUnidade(quantidade: number, unidade: UnidadeMaterial): string {
   return `${quantidade.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} ${unidade}`;
