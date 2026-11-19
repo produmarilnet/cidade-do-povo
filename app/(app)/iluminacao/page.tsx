@@ -6,7 +6,7 @@ import { pode } from "@/lib/permissoes";
 import { ATENDENTE_QR, COR_SITUACAO, dataDaFicha, NOME_SITUACAO, numeroDaOrdem } from "@/lib/iluminacao";
 import { SITUACOES_ORDEM, type OrdemServico, type SituacaoOrdem } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Cartao, Etiqueta, Titulo, classeBotao } from "@/components/ui";
+import { Aviso, Cartao, Etiqueta, Titulo, classeBotao } from "@/components/ui";
 
 const FILTROS: { valor: SituacaoOrdem | "todas"; texto: string }[] = [
   { valor: "aberta", texto: "Abertas" },
@@ -15,7 +15,7 @@ const FILTROS: { valor: SituacaoOrdem | "todas"; texto: string }[] = [
   { valor: "todas", texto: "Todas" },
 ];
 
-export default async function OrdensPage({ searchParams }: { searchParams: { situacao?: string; busca?: string } }) {
+export default async function OrdensPage({ searchParams }: { searchParams: { situacao?: string; busca?: string; excluida?: string } }) {
   const eu = await exigirUsuario("verIluminacao");
   const situacao = (SITUACOES_ORDEM as readonly string[]).includes(searchParams.situacao ?? "")
     ? (searchParams.situacao as SituacaoOrdem)
@@ -23,6 +23,7 @@ export default async function OrdensPage({ searchParams }: { searchParams: { sit
       ? "todas"
       : "aberta";
   const busca = (searchParams.busca ?? "").trim();
+  const excluida = /^\d+$/.test(searchParams.excluida ?? "") ? numeroDaOrdem(Number(searchParams.excluida)) : null;
   const padrao = `%${busca}%`;
 
   const ordens = await sql<OrdemServico[]>`
@@ -55,6 +56,12 @@ export default async function OrdensPage({ searchParams }: { searchParams: { sit
       >
         Iluminação pública
       </Titulo>
+
+      {excluida && (
+        <div className="mb-3">
+          <Aviso tipo="ok">Ordem nº {excluida} excluída.</Aviso>
+        </div>
+      )}
 
       <div className="mb-3 flex flex-wrap gap-1">
         {FILTROS.map((f) => (

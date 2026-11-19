@@ -5,7 +5,7 @@ import { z } from "zod";
 import { sql } from "@/lib/db";
 import { exigirUsuario, gerarHashDeSenha } from "@/lib/auth";
 import { erroDeValidacao, type Resultado } from "@/lib/resultado";
-import { PAPEIS, type Papel } from "@/lib/types";
+import { NOME_PAPEL, PAPEIS, type Papel } from "@/lib/types";
 
 const senha = z.string().min(6, "A senha precisa ter pelo menos 6 caracteres.");
 
@@ -29,7 +29,11 @@ export async function criarUsuario(_: Resultado, dados: FormData): Promise<Resul
     return { ok: false, erro: "Já existe um usuário com esse email." };
   }
   revalidatePath("/usuarios");
-  return { ok: true, mensagem: `${u.nome} cadastrado. Passe o email e a senha para a pessoa.` };
+  return {
+    ok: true,
+    mensagem: `${u.nome} cadastrado. Mande o acesso para a pessoa no quadro verde.`,
+    acesso: { nome: u.nome, email: u.email, senha: u.senha, papel: NOME_PAPEL[u.papel] },
+  };
 }
 
 /** Garante que sempre sobra pelo menos um administrador ativo. */
@@ -60,7 +64,14 @@ export async function redefinirSenha(id: string, _: Resultado, dados: FormData):
   await exigirUsuario("gerenciarUsuarios");
   const lido = senha.safeParse(dados.get("senha"));
   if (!lido.success) return erroDeValidacao(lido.error);
-  await sql`update usuarios set senha_hash = ${await gerarHashDeSenha(lido.data)} where id = ${id}`;
+  const [u] = await sql<{ nome: string; email: string; papel: Papel }[]>`
+    update usuarios set senha_hash = ${await gerarHashDeSenha(lido.data)} where id = ${id}
+    returning nome, email, papel`;
+  if (!u) return { ok: false, erro: "Usuário não encontrado." };
   await sql`delete from sessoes where usuario_id = ${id}`;
-  return { ok: true, mensagem: "Senha trocada." };
+  return {
+    ok: true,
+    mensagem: "Senha trocada.",
+    acesso: { nome: u.nome, email: u.email, senha: lido.data, papel: NOME_PAPEL[u.papel] },
+  };
 }

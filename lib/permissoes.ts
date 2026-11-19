@@ -6,6 +6,8 @@ export const PODE = {
   verIluminacao: ["admin", "atendente", "eletricista", "visualizador"],
   // abrir, corrigir e cancelar ordem de serviço
   abrirOrdens: ["admin", "atendente"],
+  // apagar a ordem de vez, com o material lançado nela (pedido do setor, 16/11/2026)
+  excluirOrdens: ["admin", "atendente"],
   // passar para o sistema o que o eletricista fez na rua
   registrarExecucao: ["admin", "atendente", "eletricista"],
   // incluir, renomear e desativar itens do banco de materiais

@@ -188,3 +188,22 @@ export async function reabrirOrdem(id: string): Promise<void> {
   revalidatePath("/iluminacao");
   revalidatePath(`/iluminacao/${id}`);
 }
+
+/**
+ * Apaga a ordem de vez, com tudo o que depende dela (o material lançado). Diferente
+ * de cancelar: some da lista e dos relatórios, e o material de uma ordem executada
+ * volta para o saldo do estoque. O nº dela não é reaproveitado.
+ */
+export async function excluirOrdem(id: string): Promise<void> {
+  await exigirUsuario("excluirOrdens");
+  const apagadas = await sql.begin(async (tx) => {
+    await tx`delete from ordem_materiais where ordem_id = ${id}`;
+    return tx<{ numero: number }[]>`delete from ordens_servico where id = ${id} returning numero`;
+  });
+  revalidatePath("/iluminacao");
+  revalidatePath("/estoque", "layout");
+  revalidatePath("/postes", "layout");
+  revalidatePath("/relatorios");
+  const numero = apagadas[0]?.numero;
+  redirect(numero ? `/iluminacao?situacao=todas&excluida=${numero}` : "/iluminacao");
+}

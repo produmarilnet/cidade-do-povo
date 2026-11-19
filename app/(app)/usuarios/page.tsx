@@ -2,14 +2,15 @@ import { exigirUsuario } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import { NOME_PAPEL, PAPEIS, type Usuario } from "@/lib/types";
-import { BotaoAcao, Formulario } from "@/components/formulario";
-import { Assistente, Escolha, Passo } from "@/components/assistente";
-import { Campo, Cartao, Etiqueta, Rotulo, Selecao, Titulo } from "@/components/ui";
+import { BotaoAcao } from "@/components/formulario";
+import { Cartao, Etiqueta, Titulo } from "@/components/ui";
 import { alternarAtivo, criarUsuario, mudarPapel, redefinirSenha } from "./actions";
+import { NovoUsuario, TrocarSenha } from "./acesso-usuario";
 
 const O_QUE_CADA_UM_FAZ: Record<string, string> = {
   admin: "Tudo, inclusive cadastrar usuários.",
-  atendente: "Abre, corrige e imprime ordens de serviço.",
+  atendente:
+    "Abre, corrige, imprime e exclui ordens de serviço, lança o material usado e cuida do banco de materiais e do estoque.",
   eletricista: "Consulta as ordens e registra o serviço feito.",
   visualizador: "Só consulta, não altera nada.",
 };
@@ -53,11 +54,7 @@ export default async function UsuariosPage() {
                         </BotaoAcao>
                       ))}
                     </div>
-                    <Formulario acao={redefinirSenha.bind(null, u.id)} limparAoSalvar textoBotao="Trocar senha" className="flex flex-wrap items-end gap-2">
-                      <Rotulo texto="Nova senha" className="flex-1">
-                        <Campo name="senha" type="text" minLength={6} autoComplete="off" voz={false} required />
-                      </Rotulo>
-                    </Formulario>
+                    <TrocarSenha acao={redefinirSenha.bind(null, u.id)} />
                     <BotaoAcao
                       acao={alternarAtivo.bind(null, u.id)}
                       confirmar={u.ativo ? `Desativar ${u.nome}? A pessoa perde o acesso na hora.` : undefined}
@@ -76,29 +73,7 @@ export default async function UsuariosPage() {
 
       <Cartao>
         <h2 className="mb-3 font-semibold">Novo usuário</h2>
-        <Assistente acao={criarUsuario} limparAoSalvar textoBotao="Cadastrar">
-          <Passo titulo="Quem é">
-            <Rotulo texto="Nome">
-              <Campo name="nome" required />
-            </Rotulo>
-            <Rotulo texto="Email (é o login)">
-              <Campo name="email" type="email" autoComplete="off" required />
-            </Rotulo>
-          </Passo>
-          <Passo titulo="Senha inicial" dica="A pessoa entra com ela e pode trocar depois em Minha conta.">
-            <Rotulo texto="Senha inicial (mínimo 6 letras ou números)">
-              <Campo name="senha" type="text" minLength={6} autoComplete="off" voz={false} required />
-            </Rotulo>
-          </Passo>
-          <Passo titulo="O que pode fazer">
-            <Escolha
-              name="papel"
-              rotulo="Papel"
-              inicial="atendente"
-              opcoes={PAPEIS.map((p) => ({ valor: p, texto: NOME_PAPEL[p], detalhe: O_QUE_CADA_UM_FAZ[p] }))}
-            />
-          </Passo>
-        </Assistente>
+        <NovoUsuario acao={criarUsuario} oQueCadaUmFaz={O_QUE_CADA_UM_FAZ} />
       </Cartao>
     </>
   );

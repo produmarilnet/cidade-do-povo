@@ -19,6 +19,15 @@ Recanto). Módulos entram aos poucos; o primeiro é o de iluminação pública.
   material aplicado, data e observações. Quando a ficha volta, isso é passado para
   o sistema em "Registrar o serviço feito" e a ordem fica executada.
 - Situações: `aberta` → `executada` (ou `cancelada`); dá para reabrir.
+- **Excluir ordem** (pedido de 16/11/2026, permissão `excluirOrdens`: admin e atendente):
+  apaga de vez a ordem e o `ordem_materiais` dela, em qualquer situação, depois de uma
+  confirmação que diz o que vai junto. Sai da lista e dos relatórios, e o material de
+  ordem executada volta ao saldo do estoque. O nº não é reaproveitado. Cancelar continua
+  existindo para o pedido que só não vai ser feito.
+- **Usuários** (pedido do dono, 19/11/2026, igual ao PRODUMAR): a senha já vem sugerida
+  (`gerarSenha` em `components/dados-de-acesso.tsx`) e, ao cadastrar ou trocar a senha,
+  aparece o quadro com site, login e senha para "Copiar recado" ou mandar no WhatsApp
+  (`wa.me/?text=`, a pessoa escolhe o contato). A ação devolve o `acesso` no `Resultado`.
 - A ficha impressa cabe em **meia folha A4** (pedido do setor, 03/11/2026): sai na
   metade de cima, com "corte aqui" embaixo. Mexeu na ficha, confira que continua
   cabendo (≤ ~140 mm de altura na largura de 190 mm).

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, Pencil } from "lucide-react";
+import { ChevronLeft, Pencil, Trash2 } from "lucide-react";
 import { exigirUsuario } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { pode } from "@/lib/permissoes";
@@ -11,7 +11,7 @@ import { hoje } from "@/lib/utils";
 import { BotaoAcao } from "@/components/formulario";
 import { BotaoImprimir } from "@/components/imprimir";
 import { Aviso, Cartao, Etiqueta, classeBotao } from "@/components/ui";
-import { cancelarOrdem, reabrirOrdem, registrarExecucao } from "../actions";
+import { cancelarOrdem, excluirOrdem, reabrirOrdem, registrarExecucao } from "../actions";
 import { Ficha } from "./ficha";
 import { FormExecucao } from "./form-execucao";
 
@@ -31,6 +31,7 @@ export default async function OrdemPage({
   if (!ordem) notFound();
 
   const podeAbrir = pode(eu.papel, "abrirOrdens");
+  const podeExcluir = pode(eu.papel, "excluirOrdens");
   const podeRegistrar = pode(eu.papel, "registrarExecucao") && ordem.situacao !== "cancelada";
 
   const materiaisDaOrdem = await sql<MaterialDaOrdem[]>`
@@ -49,6 +50,20 @@ export default async function OrdemPage({
       if (m.material_id) saldos[m.material_id] = Math.round(((saldos[m.material_id] ?? 0) + m.quantidade) * 100) / 100;
     }
   }
+
+  // a confirmação diz tudo o que vai embora junto com a ordem
+  const avisoDeExclusao = [
+    `EXCLUIR DE VEZ a ordem nº ${numeroDaOrdem(ordem.numero)} (${ordem.nome})?`,
+    "",
+    materiaisDaOrdem.length > 0
+      ? (materiaisDaOrdem.length === 1
+          ? "Apaga a ordem e o material lançado nela."
+          : `Apaga a ordem e os ${materiaisDaOrdem.length} materiais lançados nela.`) +
+        (ordem.situacao === "executada" ? " O material volta para o saldo do estoque." : "")
+      : "Apaga a ordem.",
+    "Ela some da lista e dos relatórios e não dá para desfazer.",
+    ...(ordem.situacao === "aberta" ? ["", "Se for só um pedido que não vai ser feito, use \"Cancelar ordem\"."] : []),
+  ].join("\n");
 
   const eletricistas = podeRegistrar
     ? (
@@ -129,9 +144,9 @@ export default async function OrdemPage({
           </Cartao>
         )}
 
-        {podeAbrir && (
+        {(podeAbrir || podeExcluir) && (
           <div className="flex flex-wrap gap-2">
-            {ordem.situacao === "aberta" && (
+            {podeAbrir && ordem.situacao === "aberta" && (
               <BotaoAcao
                 acao={cancelarOrdem.bind(null, ordem.id)}
                 confirmar={`Cancelar a ordem nº ${numeroDaOrdem(ordem.numero)}?`}
@@ -141,13 +156,24 @@ export default async function OrdemPage({
                 Cancelar ordem
               </BotaoAcao>
             )}
-            {ordem.situacao !== "aberta" && (
+            {podeAbrir && ordem.situacao !== "aberta" && (
               <BotaoAcao
                 acao={reabrirOrdem.bind(null, ordem.id)}
                 confirmar={`Reabrir a ordem nº ${numeroDaOrdem(ordem.numero)}? Ela volta para a lista de abertas.`}
                 variante="fantasma"
               >
                 Reabrir ordem
+              </BotaoAcao>
+            )}
+            {podeExcluir && (
+              <BotaoAcao
+                acao={excluirOrdem.bind(null, ordem.id)}
+                confirmar={avisoDeExclusao}
+                variante="fantasma"
+                className="text-red-700"
+              >
+                <Trash2 className="h-4 w-4" />
+                Excluir ordem
               </BotaoAcao>
             )}
           </div>

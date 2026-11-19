@@ -1,7 +1,13 @@
 import type { ZodError } from "zod";
 
 /** O que toda server action de formulário devolve para a tela. */
-export type Resultado = { ok: boolean; erro?: string; mensagem?: string };
+export type Resultado = {
+  ok: boolean;
+  erro?: string;
+  mensagem?: string;
+  /** Usuário criado ou senha trocada: o login e a senha, para a tela montar o recado do WhatsApp. */
+  acesso?: { nome: string; email: string; senha: string; papel: string };
+};
 
 export function erroDeValidacao(erro: ZodError): Resultado {
   const problema = erro.issues[0];

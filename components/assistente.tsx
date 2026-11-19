@@ -141,7 +141,7 @@ export function Assistente({
   textoBotao?: string;
   limparAoSalvar?: boolean;
   /** Chamado depois de salvar com sucesso (ex.: limpar campos controlados pela tela). */
-  aoSalvar?: () => void;
+  aoSalvar?: (estado: Resultado) => void;
   /** Editar: abre direto na conferência, e é só tocar em "Alterar" no que mudou. */
   comecarNaConferencia?: boolean;
 }) {
@@ -189,7 +189,7 @@ export function Assistente({
       setAtual(0);
       setJaConferiu(false);
     }
-    aoSalvar?.();
+    aoSalvar?.(estado);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [estado]);
 
