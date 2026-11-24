@@ -23,6 +23,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     });
   }
 
+  if (pode(usuario.papel, "verEletricistas")) {
+    grupos.push({
+      titulo: "Equipe",
+      itens: [{ href: "/eletricistas", texto: "Eletricistas", icone: "eletricistas" }],
+    });
+  }
+
   if (pode(usuario.papel, "verEstoque")) {
     const estoque: GrupoMenu = {
       titulo: "Estoque",

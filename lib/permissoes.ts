@@ -22,6 +22,10 @@ export const PODE = {
   cadastrarPostes: ["admin", "atendente", "eletricista"],
   // gerar lote de etiquetas e desativar poste
   gerenciarPostes: ["admin", "atendente"],
+  // ver a equipe: cadastro, EPI entregue, folgas e faltas (pedido de 24/11/2026)
+  verEletricistas: ["admin", "atendente", "visualizador"],
+  // cadastrar eletricista, lançar entrega de EPI, folga e falta, desligar
+  gerenciarEletricistas: ["admin", "atendente"],
 } satisfies Record<string, readonly Papel[]>;
 
 export type Permissao = keyof typeof PODE;

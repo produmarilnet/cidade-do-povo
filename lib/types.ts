@@ -100,3 +100,45 @@ export type MaterialDaOrdem = {
   quantidade: number;
   unidade: UnidadeMaterial;
 };
+
+// ── Eletricistas (migration 0007) ──────────────────────────────────────────
+
+/** Eletricista da equipe. Não é o login: pode não ter usuário no sistema. */
+export type Eletricista = {
+  id: string;
+  nome: string;
+  apelido: string | null;
+  funcao: string | null;
+  cpf: string | null;
+  telefone: string | null;
+  data_admissao: string; // AAAA-MM-DD
+  tamanho_camisa: string | null;
+  tamanho_calca: string | null;
+  tamanho_bota: string | null;
+  observacoes: string | null;
+  ativo: boolean; // false = desligado
+};
+
+/** Material de segurança (EPI) entregue — uma linha por item. */
+export type EpiEntregue = {
+  id: string;
+  eletricista_id: string;
+  data: string; // AAAA-MM-DD
+  item: string;
+  quantidade: number;
+  ca: string | null;
+  observacao: string | null;
+};
+
+export const TIPOS_OCORRENCIA = ["folga", "falta", "falta_justificada", "atestado", "ferias", "outro"] as const;
+export type TipoOcorrencia = (typeof TIPOS_OCORRENCIA)[number];
+
+/** Folga, falta, atestado, férias… de um dia (inicio = fim) ou de um período. */
+export type Ocorrencia = {
+  id: string;
+  eletricista_id: string;
+  tipo: TipoOcorrencia;
+  inicio: string; // AAAA-MM-DD
+  fim: string; // AAAA-MM-DD
+  observacao: string | null;
+};

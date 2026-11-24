@@ -104,6 +104,21 @@ Recanto). Módulos entram aos poucos; o primeiro é o de iluminação pública.
     ordens e postes.
   - Poste sai de uso desativado, nunca apagado: a etiqueta pode estar na rua.
 
+- **Eletricistas** (`/eletricistas`, `lib/eletricistas.ts`, migration 0007, pedido do dono
+  em 24/11/2026). Menu "Equipe". Ver: admin, atendente, visualizador; mexer: admin e atendente.
+  - **Cadastro** (`eletricistas`): nome, apelido, função, CPF, telefone, admissão e tamanhos
+    (camisa, calça, bota, para separar o uniforme). Não é o login: o eletricista pode não
+    ter usuário. Quem sai é **desligado** (`ativo = false`), nunca apagado.
+  - **Materiais de segurança (EPI)** (`eletricista_epis`): uma linha por item, os entregues
+    juntos com a mesma data. A tela marca vários de uma vez (`EPIS_COMUNS` + "outro") com
+    quantidade. O nº do CA não é pedido na tela (é de cada material): a coluna sai em branco
+    na **Ficha de EPI** impressa (`/eletricistas/[id]/ficha-epi`), uma A4 com a declaração e
+    a coluna de assinatura de cada entrega, mais linhas em branco.
+  - **Folgas, faltas…** (`eletricista_ocorrencias`): folga, falta, falta justificada, atestado,
+    férias e outro, de um dia (`fim = inicio`) ou de um período. A ficha soma os dias de cada
+    tipo no ano (período que vira o ano conta a parte de cada ano). A lista mostra quem está
+    fora hoje e as faltas (só as sem justificativa) do ano.
+
 ## Stack e decisões
 
 - Next.js 14 App Router · TypeScript · Tailwind · Postgres puro com o driver `postgres`.
