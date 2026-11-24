@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
   ArrowDownToLine,
   Boxes,
+  Car,
   FileBarChart,
   HardHat,
   LayoutDashboard,
@@ -38,6 +39,7 @@ const ICONES = {
   postes: UtilityPole,
   relatorios: FileBarChart,
   eletricistas: HardHat,
+  frota: Car,
   estoque: Boxes,
   entrada: ArrowDownToLine,
   materiais: Package,

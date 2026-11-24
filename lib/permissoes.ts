@@ -26,6 +26,12 @@ export const PODE = {
   verEletricistas: ["admin", "atendente", "visualizador"],
   // cadastrar eletricista, lançar entrega de EPI, folga e falta, desligar
   gerenciarEletricistas: ["admin", "atendente"],
+  // ver os veículos, as manutenções e os checklists (pedido de 24/11/2026)
+  verFrota: ["admin", "atendente", "eletricista", "visualizador"],
+  // fazer o checklist do veículo antes de sair (quem dirige é o eletricista)
+  fazerChecklist: ["admin", "atendente", "eletricista"],
+  // cadastrar veículo, lançar manutenção, desativar
+  gerenciarFrota: ["admin", "atendente"],
 } satisfies Record<string, readonly Papel[]>;
 
 export type Permissao = keyof typeof PODE;

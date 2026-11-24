@@ -142,3 +142,54 @@ export type Ocorrencia = {
   fim: string; // AAAA-MM-DD
   observacao: string | null;
 };
+
+// ── Frota (migration 0008) ─────────────────────────────────────────────────
+
+export type Veiculo = {
+  id: string;
+  placa: string;
+  modelo: string;
+  marca: string | null;
+  ano: number | null;
+  cor: string | null;
+  tipo: string | null;
+  renavam: string | null;
+  chassi: string | null;
+  km_inicial: number;
+  observacoes: string | null;
+  ativo: boolean;
+};
+
+export type TipoManutencao = "preventiva" | "corretiva";
+
+export type Manutencao = {
+  id: string;
+  veiculo_id: string;
+  data: string; // AAAA-MM-DD
+  km: number | null;
+  tipo: TipoManutencao;
+  servico: string;
+  oficina: string | null;
+  valor: number | null;
+  proxima_km: number | null;
+  proxima_data: string | null;
+  observacao: string | null;
+};
+
+export const SITUACOES_ITEM = ["ok", "problema", "na"] as const;
+export type SituacaoItem = (typeof SITUACOES_ITEM)[number];
+
+/** Um item conferido no checklist. */
+export type ItemChecklist = { grupo: string; item: string; situacao: SituacaoItem; obs?: string };
+
+export type Checklist = {
+  id: string;
+  veiculo_id: string;
+  data: string; // AAAA-MM-DD
+  km: number | null;
+  responsavel: string;
+  itens: ItemChecklist[];
+  problemas: number;
+  observacao: string | null;
+  criado_em: Date;
+};

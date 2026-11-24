@@ -23,12 +23,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     });
   }
 
+  const equipe: GrupoMenu = { titulo: "Equipe", itens: [] };
   if (pode(usuario.papel, "verEletricistas")) {
-    grupos.push({
-      titulo: "Equipe",
-      itens: [{ href: "/eletricistas", texto: "Eletricistas", icone: "eletricistas" }],
-    });
+    equipe.itens.push({ href: "/eletricistas", texto: "Eletricistas", icone: "eletricistas" });
   }
+  if (pode(usuario.papel, "verFrota")) {
+    equipe.itens.push({ href: "/frota", texto: "Frota", icone: "frota" });
+  }
+  if (equipe.itens.length > 0) grupos.push(equipe);
 
   if (pode(usuario.papel, "verEstoque")) {
     const estoque: GrupoMenu = {

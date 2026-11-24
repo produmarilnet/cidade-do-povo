@@ -119,6 +119,25 @@ Recanto). Módulos entram aos poucos; o primeiro é o de iluminação pública.
     tipo no ano (período que vira o ano conta a parte de cada ano). A lista mostra quem está
     fora hoje e as faltas (só as sem justificativa) do ano.
 
+- **Frota** (`/frota`, `lib/frota.ts`, migration 0008, pedido do dono em 24/11/2026). Menu
+  "Equipe". Ver: todos; checklist: admin, atendente e eletricista (quem dirige); cadastro e
+  manutenção: admin e atendente.
+  - **Veículo** (`veiculos`): placa (única, com ou sem traço), modelo, tipo, marca, ano, cor,
+    Renavam, chassi e o km do dia do cadastro. **Km atual = o maior km lançado** (cadastro,
+    manutenção ou checklist), não se digita à parte. Sai da frota desativado, nunca apagado.
+  - **Manutenção** (`veiculo_manutencoes`): preventiva ou corretiva, o que foi feito, data, km,
+    oficina, valor e a **próxima** (km e/ou data). Vale a próxima da última manutenção lançada
+    com próxima; vence pelo que chegar primeiro, "chegando" a 500 km ou 15 dias.
+  - **Checklist** (`veiculo_checklists`): quem, data e km; depois um grupo de itens por tela
+    (`CHECKLIST`), cada item OK / Problema / Não tem, com "Marcar o resto como OK". O grupo
+    "Cesto aéreo" só aparece para veículo com cesto/munck no tipo ou no modelo (`temCesto`).
+    Os itens ficam em jsonb (texto copiado) e `problemas` conta os com problema. A folha
+    impressa cabe numa A4.
+  - **Nome de campo com acento chega estragado na server action** (Next 14): os itens do
+    checklist vão como `item:<grupo>-<item>` (posições em `CHECKLIST`). Mudar a ordem da
+    lista não estraga os checklists antigos (guardam o texto), mas nunca usar texto com
+    acento em `name` de campo.
+
 ## Stack e decisões
 
 - Next.js 14 App Router · TypeScript · Tailwind · Postgres puro com o driver `postgres`.
