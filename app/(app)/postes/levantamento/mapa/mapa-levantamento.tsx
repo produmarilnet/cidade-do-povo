@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CircleMarker, Map as MapaLeaflet } from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { camadasDoMapa } from "@/lib/camadas-mapa";
 import { LocateFixed } from "lucide-react";
 import { Botao } from "@/components/ui";
 
@@ -26,10 +27,8 @@ export function MapaLevantamento({ pontos, ver }: { pontos: readonly PontoNoMapa
       mapa = L.map(caixa.current, { preferCanvas: true });
       mapaRef.current = mapa;
       mapa.attributionControl.setPrefix(false);
-      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap",
-      }).addTo(mapa);
+      // satélite (casas e ruas vistas de cima) com o nome das ruas; dá para trocar pelo mapa desenhado
+      camadasDoMapa(L, mapa);
 
       const ficha = (id: number) => {
         const link = document.createElement("a");
@@ -42,10 +41,10 @@ export function MapaLevantamento({ pontos, ver }: { pontos: readonly PontoNoMapa
       for (const [id, lat, lng, apagada] of pontos) {
         const destaque = id === ver;
         const marca = L.circleMarker([lat, lng], {
-          radius: destaque ? 10 : 5,
+          radius: destaque ? 11 : 6,
           color: "#fff",
-          weight: destaque ? 3 : 1,
-          fillColor: destaque ? "#f59e0b" : apagada ? "#dc2626" : "#214DB0",
+          weight: destaque ? 3 : 1.5,
+          fillColor: destaque ? "#22d3ee" : apagada ? "#dc2626" : "#facc15",
           fillOpacity: 1,
         })
           .bindPopup(() => ficha(id))

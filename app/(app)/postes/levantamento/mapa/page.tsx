@@ -24,7 +24,8 @@ export default async function MapaDoLevantamentoPage({ searchParams }: { searchP
       </Link>
       <Titulo>Mapa do levantamento</Titulo>
       <p className="-mt-2 mb-3 text-sm text-stone-500">
-        {pontos.length.toLocaleString("pt-BR")} pontos. Em vermelho, os que estavam sem lâmpada ou com ela quebrada.
+        {pontos.length.toLocaleString("pt-BR")} pontos, em amarelo; em vermelho, os que estavam sem lâmpada ou com ela quebrada.
+        O mapa abre no satélite (as casas e as ruas vistas de cima) — o botão de camadas, no canto, troca para o mapa de ruas.
         Toque num ponto para ver a ficha; o botão de mira mostra onde você está.
       </p>
       <MapaLevantamento pontos={pontos} ver={Number.isInteger(ver) ? ver : null} />

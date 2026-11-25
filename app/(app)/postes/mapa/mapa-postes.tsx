@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { Map as MapaLeaflet } from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { camadasDoMapa } from "@/lib/camadas-mapa";
 import { numeroDoPoste } from "@/lib/postes";
 
 export type PosteNoMapa = {
@@ -25,10 +26,8 @@ export function MapaPostes({ postes }: { postes: PosteNoMapa[] }) {
       // canvas: com milhares de pontos, elementos soltos deixariam o celular lento
       mapa = L.map(caixa.current, { preferCanvas: true });
       mapa.attributionControl.setPrefix(false);
-      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap",
-      }).addTo(mapa);
+      // satélite (casas e ruas vistas de cima) com o nome das ruas; dá para trocar pelo mapa desenhado
+      camadasDoMapa(L, mapa);
 
       for (const p of postes) {
         const cor = p.abertas > 0 ? "#dc2626" : "#214DB0";

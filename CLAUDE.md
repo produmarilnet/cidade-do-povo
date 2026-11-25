@@ -120,6 +120,11 @@ Recanto). Módulos entram aos poucos; o primeiro é o de iluminação pública.
     leva à nova ordem com rua, bairro e o ponto/GPS no ponto de referência (`?levantamento=<id>`).
   - **Mapa** (`/postes/levantamento/mapa`): todos os pontos em canvas, os sem lâmpada ou com
     lâmpada quebrada em vermelho, "Onde estou" e `?ver=<id>` para abrir em cima de um.
+  - **Fundo dos mapas = satélite** (`lib/camadas-mapa.ts`, pedido de 25/11/2026: ver o poste "onde
+    vejo as casas e a rua"): foto da Esri (World_Imagery) com o nome das ruas por cima, sem chave;
+    o botão de camadas volta ao OpenStreetMap. Em São Mateus a foto vai só até o **zoom 17**
+    (no 18 vem "Map data not yet available"): `maxNativeZoom: 17` e acima disso amplia. Vale
+    para o mapa dos postes de QR, o do levantamento e o mapinha da ficha do ponto.
   - Para trocar o levantamento por um arquivo novo: gerar outra migration a partir do KML
     (dentro do KMZ, que é um zip), lendo a tabela HTML da `description` de cada Placemark.
 
