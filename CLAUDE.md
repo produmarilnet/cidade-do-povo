@@ -104,6 +104,25 @@ Recanto). Módulos entram aos poucos; o primeiro é o de iluminação pública.
     ordens e postes.
   - Poste sai de uso desativado, nunca apagado: a etiqueta pode estar na rua.
 
+- **Levantamento da iluminação** (`/postes/levantamento`, `lib/levantamento.ts`, migration 0009,
+  pedido do dono em 25/11/2026). Os 5.252 pontos do arquivo "São Mateus do Maranhão_Kmz_Geral.kmz"
+  do cadastro feito no **GlobalCAD**, para achar o poste na rua pelo celular.
+  - Tabela à parte (`levantamento_ip`), só leitura: é a cidade como estava naquele cadastro,
+    não se mistura com os postes de QR. Não tem nº de plaqueta: o ponto se chama
+    "formulário-ponto" (`codigoDoPonto`), e o mesmo formulário-ponto pode aparecer 2 vezes
+    (duas luminárias no mesmo poste).
+  - **Busca** por rua, bairro, chave, tipo ou nº do formulário (sem acento, com `translate`);
+    "4349573-3" acha o ponto exato. **Perto de mim**: uma leitura do GPS vai na URL
+    (`lat`/`lng`) e a lista vem por distância (conta plana, serve na escala da cidade).
+  - **Ficha** (`/postes/levantamento/[id]`): os dados, as fotos (ficam no GlobalCAD; o banco
+    guarda só o caminho BLOB, `fotoDoPonto` monta o endereço — abrem sem login) e os botões
+    que abrem o caminho no **Google Maps** ou no **Mapas do iPhone**. "Abrir ordem neste poste"
+    leva à nova ordem com rua, bairro e o ponto/GPS no ponto de referência (`?levantamento=<id>`).
+  - **Mapa** (`/postes/levantamento/mapa`): todos os pontos em canvas, os sem lâmpada ou com
+    lâmpada quebrada em vermelho, "Onde estou" e `?ver=<id>` para abrir em cima de um.
+  - Para trocar o levantamento por um arquivo novo: gerar outra migration a partir do KML
+    (dentro do KMZ, que é um zip), lendo a tabela HTML da `description` de cada Placemark.
+
 - **Eletricistas** (`/eletricistas`, `lib/eletricistas.ts`, migration 0007, pedido do dono
   em 24/11/2026). Menu "Equipe". Ver: admin, atendente, visualizador; mexer: admin e atendente.
   - **Cadastro** (`eletricistas`): nome, apelido, função, CPF, telefone, admissão e tamanhos

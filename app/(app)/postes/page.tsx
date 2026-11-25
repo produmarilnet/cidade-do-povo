@@ -74,6 +74,10 @@ export default async function PostesPage({ searchParams }: { searchParams: { ver
               <IconeMapa className="h-4 w-4" />
               Mapa
             </Link>
+            <Link href="/postes/levantamento" className={classeBotao("secundario")}>
+              <Search className="h-4 w-4" />
+              Levantamento
+            </Link>
             <Link href="/postes/etiquetas" className={classeBotao("secundario")}>
               <Printer className="h-4 w-4" />
               Etiquetas
