@@ -33,7 +33,7 @@ export function MapaLevantamento({ pontos, ver }: { pontos: readonly PontoNoMapa
       const ficha = (id: number) => {
         const link = document.createElement("a");
         link.href = `/postes/levantamento/${id}`;
-        link.textContent = "Ver a ficha do poste";
+        link.textContent = "Ver a ficha (satélite nítido)";
         return link;
       };
 

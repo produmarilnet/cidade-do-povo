@@ -124,7 +124,12 @@ Recanto). Módulos entram aos poucos; o primeiro é o de iluminação pública.
     vejo as casas e a rua"): foto da Esri (World_Imagery) com o nome das ruas por cima, sem chave;
     o botão de camadas volta ao OpenStreetMap. Em São Mateus a foto vai só até o **zoom 17**
     (no 18 vem "Map data not yet available"): `maxNativeZoom: 17` e acima disso amplia. Vale
-    para o mapa dos postes de QR, o do levantamento e o mapinha da ficha do ponto.
+    para o mapa dos postes de QR e o do levantamento (zoom máximo 18).
+  - **Satélite nítido na ficha** (`components/satelite-google.tsx`, pedido de 25/11/2026: "a imagem
+    não está nítida"): a ficha do ponto do levantamento e a do poste de QR mostram o quadro de
+    incorporar do Google (`maps.google.com/maps?q=lat,lng&t=k&z=19&output=embed`), sem chave: a
+    foto do Google em São Mateus é bem melhor que a da Esri. Só serve para um ponto com
+    alfinete; o mapa com milhares de pontos continua no Leaflet com a Esri.
   - Para trocar o levantamento por um arquivo novo: gerar outra migration a partir do KML
     (dentro do KMZ, que é um zip), lendo a tabela HTML da `description` de cada Placemark.
 

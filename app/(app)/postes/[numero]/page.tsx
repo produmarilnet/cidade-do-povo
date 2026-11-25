@@ -9,6 +9,7 @@ import { enderecoDoQr, lerNumeroDoPoste, linkDoMapa, numeroDoPoste, textoDaPreci
 import type { OrdemServico, Poste } from "@/lib/types";
 import { BotaoAcao } from "@/components/formulario";
 import { QrCode } from "@/components/qr-code";
+import { SateliteGoogle } from "@/components/satelite-google";
 import { Aviso, Cartao, Etiqueta, classeBotao } from "@/components/ui";
 import { ativarPoste } from "../actions";
 
@@ -101,6 +102,10 @@ export default async function PostePage({
               </Link>
             )}
           </Cartao>
+        )}
+
+        {cadastrado && poste.latitude != null && poste.longitude != null && (
+          <SateliteGoogle latitude={poste.latitude} longitude={poste.longitude} />
         )}
 
         <div className="grid gap-4 md:grid-cols-[1fr_auto]">

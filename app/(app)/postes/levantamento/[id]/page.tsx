@@ -14,7 +14,7 @@ import {
 } from "@/lib/levantamento";
 import { pode } from "@/lib/permissoes";
 import { Cartao, classeBotao } from "@/components/ui";
-import { MapaDoPonto } from "./mapa-do-ponto";
+import { SateliteGoogle } from "@/components/satelite-google";
 
 function Dado({ rotulo, valor }: { rotulo: string; valor: string | null | undefined }) {
   return (
@@ -65,8 +65,8 @@ export default async function PontoDoLevantamentoPage({
       </p>
 
       <div className="flex flex-col gap-4">
-        {/* onde fica: satélite bem de perto, com as casas e a rua em volta */}
-        <MapaDoPonto latitude={p.latitude} longitude={p.longitude} />
+        {/* onde fica: satélite do Google bem de perto, com as casas, a rua e o alfinete no poste */}
+        <SateliteGoogle latitude={p.latitude} longitude={p.longitude} />
 
         {/* ir até o poste: abre o aplicativo de mapas do celular */}
         <Cartao className="flex flex-col gap-2">

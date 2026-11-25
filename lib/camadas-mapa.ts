@@ -14,25 +14,25 @@ export function camadasDoMapa(L: Leaflet, mapa: MapaLeaflet, inicio: "satelite" 
   // available"); acima disso o Leaflet amplia a foto do 17
   const foto = L.tileLayer(`${esri}/World_Imagery/MapServer/tile/{z}/{y}/{x}`, {
     maxNativeZoom: 17,
-    maxZoom: 20,
+    maxZoom: 18,
     attribution: "Imagem &copy; Esri",
   });
   const nomes = L.tileLayer(`${esri}/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}`, {
     maxNativeZoom: 17,
-    maxZoom: 20,
+    maxZoom: 18,
   });
   const lugares = L.tileLayer(`${esri}/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}`, {
     maxNativeZoom: 17,
-    maxZoom: 20,
+    maxZoom: 18,
   });
   const satelite = L.layerGroup([foto, nomes, lugares]);
   const ruas = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxNativeZoom: 19,
-    maxZoom: 20,
+    maxZoom: 18,
     attribution: "&copy; OpenStreetMap",
   });
 
   (inicio === "satelite" ? satelite : ruas).addTo(mapa);
   L.control.layers({ "Satélite": satelite, "Mapa de ruas": ruas }, undefined, { position: "topright" }).addTo(mapa);
-  mapa.setMaxZoom(20);
+  mapa.setMaxZoom(18);
 }
